@@ -18,6 +18,7 @@ Mở `http://localhost:3000`.
 
 ```bash
 pnpm lint
+pnpm check:test-layout
 pnpm typecheck
 pnpm test:run
 pnpm build
@@ -28,6 +29,8 @@ Chạy toàn bộ quality gate giống CI bằng:
 ```bash
 pnpm quality
 ```
+
+Test phải nằm trong thư mục `tests/` gần module tương ứng. Xem [testing conventions](./docs/engineering/TESTING_CONVENTIONS.md) trước khi thêm test, mock hoặc fixture mới.
 
 ## Environment variables
 
@@ -73,6 +76,19 @@ pnpm db:studio
 ```
 
 Migration integration test dùng PostgreSQL in-memory qua PGlite và pgvector, vì vậy có thể xác nhận migration chạy từ database trống mà không cần dùng database production.
+
+## Source registry
+
+Đăng ký metadata và SHA-256 checksum của Markdown/PDF trước khi import nội dung:
+
+```bash
+pnpm source:register -- --file /absolute/path/to/source.md
+pnpm source:scan -- /absolute/path/to/source-directory
+pnpm source:list
+pnpm source:list -- --status outdated
+```
+
+Các lệnh cần `DATABASE_URL`. Inventory nguồn ban đầu nằm tại [SOURCE_INVENTORY.md](./docs/content/SOURCE_INVENTORY.md).
 
 ## UI foundation
 

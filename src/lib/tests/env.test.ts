@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getRequiredEnv } from "@/lib/env";
+import { getRequiredEnv } from "../env";
 
 describe("getRequiredEnv", () => {
   it("returns a configured value", () => {

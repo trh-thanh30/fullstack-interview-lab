@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isAllowedEmail, parseAllowedEmails } from "./allowlist";
+import { isAllowedEmail, parseAllowedEmails } from "../allowlist";
 
 describe("authentication email allowlist", () => {
   it("normalizes comma, semicolon, whitespace and letter casing", () => {

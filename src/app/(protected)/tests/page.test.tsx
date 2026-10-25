@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import DashboardPage from "@/app/(protected)/page";
+import DashboardPage from "../page";
 
 describe("DashboardPage", () => {
   it("renders the primary practice action and learning tracks", () => {

@@ -13,11 +13,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "quality": "pnpm lint && pnpm typecheck && pnpm test:run && pnpm build",
+    "quality": "pnpm check:test-layout && pnpm lint && pnpm typecheck && pnpm test:run && pnpm build",
+    "check:test-layout": "node tests/scripts/check-test-layout.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "source:list": "tsx scripts/sources.ts list",
+    "source:register": "tsx scripts/sources.ts register",
+    "source:scan": "tsx scripts/sources.ts scan"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

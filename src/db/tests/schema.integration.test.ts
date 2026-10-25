@@ -8,7 +8,7 @@ import { vector } from "@electric-sql/pglite-pgvector";
 import { drizzle } from "drizzle-orm/pglite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { seedTaxonomy } from "./seed";
+import { seedTaxonomy } from "../seed";
 
 describe("initial database migration", () => {
   let client: PGlite;
