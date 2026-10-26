@@ -38,3 +38,15 @@ pnpm source:list -- --status outdated
 ```
 
 Scanner chỉ đăng ký metadata và checksum, chưa tạo `source_chunks`. Chạy lại an toàn: checksum giống nhau trả `unchanged`/`duplicate`; nội dung thay đổi tại cùng URI chuyển source sang `outdated` để importer xử lý lại.
+
+## Markdown allowlist của ING-002
+
+Importer ban đầu chỉ quét các directory đã phê duyệt:
+
+- `frontend/javascript`
+- `frontend/react`
+- `backend/nodejs`
+- `backend/nestjs`
+- `devops/docker`
+
+Allowlist hiện có 8 file Markdown, bao gồm đầy đủ năm README bắt buộc. Kết quả parse kiểm chứng là 322 section chunks với checksum duy nhất trong từng source. Các directory khác trong kho sẽ được thêm có chủ đích sau khi kiểm tra chất lượng và quyền sử dụng.

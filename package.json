@@ -21,7 +21,8 @@
     "db:studio": "drizzle-kit studio",
     "source:list": "tsx scripts/sources.ts list",
     "source:register": "tsx scripts/sources.ts register",
-    "source:scan": "tsx scripts/sources.ts scan"
+    "source:scan": "tsx scripts/sources.ts scan",
+    "source:import-markdown": "tsx scripts/import-markdown.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -90,6 +90,16 @@ pnpm source:list -- --status outdated
 
 Các lệnh cần `DATABASE_URL`. Inventory nguồn ban đầu nằm tại [SOURCE_INVENTORY.md](./docs/content/SOURCE_INVENTORY.md).
 
+Import các Markdown thuộc allowlist JavaScript, React, Node.js, NestJS và Docker:
+
+```bash
+pnpm source:import-markdown -- \
+  --root /home/trh_thanh30/Documents/fullstack-interviews \
+  --license-note "Internal use only; license review pending"
+```
+
+Importer chia chunk theo section heading, giữ nguyên Markdown của paragraph, list, image và fenced code block. Lỗi được cô lập theo file và batch trả exit code khác `0` nếu có file thất bại.
+
 ## UI foundation
 
 Design system dùng shadcn/ui `base-nova`, Tailwind CSS v4 và Base UI primitives. Xem [quy ước UI](./docs/system-design/DESIGN_SYSTEM.md) trước khi thêm component mới.

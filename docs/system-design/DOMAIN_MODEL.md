@@ -34,6 +34,16 @@ erDiagram
 - Foreign key `restrict` bảo vệ taxonomy/source đang được tham chiếu; dữ liệu session phụ thuộc user dùng cascade.
 - Vector có 1536 chiều và HNSW cosine index; migration tạo extension `vector` trước khi tạo bảng.
 
+## Markdown ingestion
+
+- Markdown importer chỉ đọc directory nằm trong allowlist, canonicalize file path và đăng ký SHA-256 trước khi parse.
+- Một heading section tạo một `source_chunk`; breadcrumb giữ toàn bộ heading ancestry và metadata giữ line range, block counts cùng image references.
+- Nội dung chunk giữ nguyên Markdown để code fence, list và image syntax không mất định dạng.
+- Exact duplicate section trong cùng source được loại bằng checksum trước khi ghi, phù hợp unique constraint `(source_id, checksum)`.
+- Việc thay chunks và chuyển source sang `processed` chạy trong một Neon HTTP batch transaction.
+- Source đã `processed` với checksum không đổi được bỏ qua. File thay đổi được parse lại và thay thế toàn bộ chunks.
+- Lỗi một file chuyển source đó sang `failed` nhưng không dừng các file còn lại trong batch.
+
 ## Migration và seed
 
 ```bash
