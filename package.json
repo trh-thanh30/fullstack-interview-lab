@@ -23,7 +23,8 @@
     "source:register": "tsx scripts/sources.ts register",
     "source:scan": "tsx scripts/sources.ts scan",
     "source:import-markdown": "tsx scripts/import-markdown.ts",
-    "source:import-pdf": "tsx scripts/import-pdf.ts"
+    "source:import-pdf": "tsx scripts/import-pdf.ts",
+    "source:normalize": "tsx scripts/normalize-sources.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

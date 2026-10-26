@@ -15,6 +15,10 @@ erDiagram
   questions ||--o{ question_choices : contains
   questions ||--o{ rubrics : versions
   sources ||--o{ source_chunks : splits
+  topics ||--o{ source_chunks : classifies
+  source_chunks ||--o{ source_chunk_technologies : tags
+  technologies ||--o{ source_chunk_technologies : identifies
+  source_chunks ||--o{ source_duplicate_candidates : compares
   source_chunks ||--o{ question_sources : supports
   questions ||--o{ question_sources : cites
   interview_sessions ||--o{ session_questions : snapshots
@@ -53,6 +57,14 @@ erDiagram
 - Heading được suy luận từ các text block ngắn ở đầu trang. Không có tín hiệu đủ mạnh thì `heading` để `null` thay vì đoán.
 - Quality score dựa trên lượng text, readable-character ratio và replacement characters; trang yếu được gắn `reviewRequired` cùng lý do.
 - PDF source dùng chung checksum registry, atomic chunk replacement và per-file failure isolation với Markdown pipeline.
+
+## Normalize, classify và deduplicate
+
+- Taxonomy classifier deterministic chuẩn hóa technology aliases, sau đó gắn một topic chính, các technology liên quan, level và content type cho mỗi chunk.
+- Classification fields nằm trực tiếp trên `source_chunks`; quan hệ nhiều-nhiều với technology nằm ở `source_chunk_technologies` để báo cáo không phụ thuộc JSON metadata.
+- Embedding dùng `text-embedding-3-small` với 1536 chiều. `embedding_model` và `embedded_at` cho phép chạy lại mà không gọi API cho vector còn hợp lệ.
+- Exact duplicate dùng checksum và luôn chạy trước semantic comparison. Semantic duplicate chỉ so chunk thuộc hai source khác nhau bằng cosine similarity.
+- Duplicate candidate không làm mất dữ liệu. Bảng `source_duplicate_candidates` giữ similarity cùng trạng thái review `pending`, `confirmed` hoặc `dismissed`; pipeline upsert lần phát hiện mới nhưng không ghi đè quyết định của người review.
 
 ## Migration và seed
 

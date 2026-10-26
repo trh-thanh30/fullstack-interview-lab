@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 
 import { PGlite } from "@electric-sql/pglite";
@@ -16,16 +16,20 @@ describe("initial database migration", () => {
   beforeAll(async () => {
     client = new PGlite({ extensions: { vector } });
 
-    const migration = await readFile(
-      join(process.cwd(), "drizzle", "0000_equal_xorn.sql"),
-      "utf8",
-    );
+    const migrationDirectory = join(process.cwd(), "drizzle");
+    const migrationFiles = (await readdir(migrationDirectory))
+      .filter((file) => file.endsWith(".sql"))
+      .sort();
 
-    for (const statement of migration.split("--> statement-breakpoint")) {
-      const sql = statement.trim();
+    for (const migrationFile of migrationFiles) {
+      const migration = await readFile(join(migrationDirectory, migrationFile), "utf8");
 
-      if (sql) {
-        await client.exec(sql);
+      for (const statement of migration.split("--> statement-breakpoint")) {
+        const sql = statement.trim();
+
+        if (sql) {
+          await client.exec(sql);
+        }
       }
     }
   }, 30_000);
@@ -52,6 +56,8 @@ describe("initial database migration", () => {
         "rubrics",
         "sources",
         "source_chunks",
+        "source_chunk_technologies",
+        "source_duplicate_candidates",
         "question_sources",
         "interview_sessions",
         "session_questions",

@@ -59,3 +59,15 @@ PDF importer chỉ nhận hai filename tại root của thư mục e-book:
 - `system-degisn.pdf`
 
 `TranHuuThanhCV.pdf` không nằm trong allowlist nên không thể bị import nhầm. Kết quả `pdftotext -layout` thực tế tạo 59 chunks cho ebook kiến trúc và 93 chunks cho system design. Trang cover/trống không tạo chunk nhưng page number gốc vẫn được giữ; vì vậy chunk đầu tiên của cả hai tài liệu có `pageNumber = 2`.
+
+## Normalize và deduplicate của ING-004
+
+Sau khi Markdown/PDF đã được import, chạy `pnpm source:normalize`. Pipeline:
+
+1. Chuẩn hóa alias technology về slug trong taxonomy, ví dụ `Node`, `NodeJS`, `Node.js` thành `nodejs`.
+2. Gắn topic/category, một hoặc nhiều technology, level và content type cho từng chunk.
+3. Chỉ gọi OpenAI Embeddings cho chunk chưa có vector hoặc được tạo bởi model khác.
+4. So checksum giữa các source trước; các cặp khác checksum mới được so cosine similarity.
+5. Upsert kết quả vào `source_duplicate_candidates` với trạng thái `pending`; không xóa source hoặc chunk.
+
+CLI in tổng số chunk theo category, technology, level và content type. Tối đa 20 duplicate candidates được preview cùng similarity, title, heading và URI của cả hai nguồn; toàn bộ kết quả vẫn nằm trong review queue.

@@ -110,6 +110,17 @@ pnpm source:import-pdf -- \
 
 PDF importer giữ page number, nhận diện heading khi có thể, loại header/footer lặp và gắn `reviewRequired` cho trang có chất lượng text thấp. Máy chạy CLI cần cài `pdftotext`; dependency này không chạy trong Vercel Functions.
 
+Sau khi import, chuẩn hóa taxonomy, tạo embedding và đưa duplicate candidate vào review queue:
+
+```bash
+pnpm source:normalize
+
+# Có thể điều chỉnh ngưỡng cosine similarity (mặc định 0.92)
+pnpm source:normalize -- --semantic-threshold 0.94
+```
+
+Lệnh cần `DATABASE_URL` và `OPENAI_API_KEY`. Pipeline dùng exact checksum trước semantic similarity, in báo cáo theo category/technology và không tự xóa chunk. Embedding hiện dùng `text-embedding-3-small` với 1536 chiều; chunk đã có embedding đúng model sẽ được bỏ qua khi chạy lại.
+
 ## UI foundation
 
 Design system dùng shadcn/ui `base-nova`, Tailwind CSS v4 và Base UI primitives. Xem [quy ước UI](./docs/system-design/DESIGN_SYSTEM.md) trước khi thêm component mới.
@@ -119,4 +130,4 @@ Domain model và các quyết định persistence nằm tại [DOMAIN_MODEL.md](
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Card vừa hoàn thành: FND-003](./docs/roadmap/phase-0-foundation/FND-003.md)
+- [Card vừa hoàn thành: ING-004](./docs/roadmap/phase-1-content-ingestion/ING-004.md)

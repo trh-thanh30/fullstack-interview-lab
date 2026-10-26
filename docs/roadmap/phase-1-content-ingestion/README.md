@@ -11,13 +11,13 @@
 - [x] [ING-001 — Source registry](./ING-001.md)
 - [x] [ING-002 — Markdown importer](./ING-002.md)
 - [x] [ING-003 — PDF importer](./ING-003.md)
-- [ ] [ING-004 — Normalize, classify và deduplicate](./ING-004.md)
+- [x] [ING-004 — Normalize, classify và deduplicate](./ING-004.md)
 
 ## Exit criteria
 
-- [ ] Import được Markdown và hai PDF kiến trúc mẫu.
-- [ ] Mỗi source chunk truy ngược được file, heading và vị trí tương đối.
-- [ ] Chạy import lại không tạo bản ghi trùng.
+- [x] Import được Markdown và hai PDF kiến trúc mẫu.
+- [x] Mỗi source chunk truy ngược được file, heading và vị trí tương đối.
+- [x] Chạy import lại không tạo bản ghi trùng.
 
 ## Điều hướng
 

@@ -39,6 +39,15 @@ export const sessionStateValues = [
 
 export const sourceTypeValues = ["markdown", "pdf", "url", "manual"] as const;
 export const sourceStatusValues = ["new", "processed", "failed", "outdated"] as const;
+export const sourceContentTypeValues = [
+  "concept",
+  "example",
+  "question",
+  "reference",
+  "mixed",
+] as const;
+export const duplicateKindValues = ["exact", "semantic"] as const;
+export const duplicateReviewStatusValues = ["pending", "confirmed", "dismissed"] as const;
 
 export const questionTypeEnum = pgEnum("question_type", questionTypeValues);
 export const questionLevelEnum = pgEnum("question_level", questionLevelValues);
@@ -47,3 +56,9 @@ export const sessionModeEnum = pgEnum("session_mode", sessionModeValues);
 export const sessionStateEnum = pgEnum("session_state", sessionStateValues);
 export const sourceTypeEnum = pgEnum("source_type", sourceTypeValues);
 export const sourceStatusEnum = pgEnum("source_status", sourceStatusValues);
+export const sourceContentTypeEnum = pgEnum("source_content_type", sourceContentTypeValues);
+export const duplicateKindEnum = pgEnum("duplicate_kind", duplicateKindValues);
+export const duplicateReviewStatusEnum = pgEnum(
+  "duplicate_review_status",
+  duplicateReviewStatusValues,
+);
