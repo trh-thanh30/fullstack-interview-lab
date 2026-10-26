@@ -100,6 +100,16 @@ pnpm source:import-markdown -- \
 
 Importer chia chunk theo section heading, giữ nguyên Markdown của paragraph, list, image và fenced code block. Lỗi được cô lập theo file và batch trả exit code khác `0` nếu có file thất bại.
 
+Import hai PDF kiến trúc thuộc allowlist bằng Poppler `pdftotext`:
+
+```bash
+pnpm source:import-pdf -- \
+  --root /home/trh_thanh30/Documents/e-book \
+  --license-note "User-provided material; redistribution rights pending"
+```
+
+PDF importer giữ page number, nhận diện heading khi có thể, loại header/footer lặp và gắn `reviewRequired` cho trang có chất lượng text thấp. Máy chạy CLI cần cài `pdftotext`; dependency này không chạy trong Vercel Functions.
+
 ## UI foundation
 
 Design system dùng shadcn/ui `base-nova`, Tailwind CSS v4 và Base UI primitives. Xem [quy ước UI](./docs/system-design/DESIGN_SYSTEM.md) trước khi thêm component mới.

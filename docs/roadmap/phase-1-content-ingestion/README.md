@@ -10,7 +10,7 @@
 
 - [x] [ING-001 — Source registry](./ING-001.md)
 - [x] [ING-002 — Markdown importer](./ING-002.md)
-- [ ] [ING-003 — PDF importer](./ING-003.md)
+- [x] [ING-003 — PDF importer](./ING-003.md)
 - [ ] [ING-004 — Normalize, classify và deduplicate](./ING-004.md)
 
 ## Exit criteria

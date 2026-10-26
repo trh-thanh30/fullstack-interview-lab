@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type { Database } from "@/db/client";
 import { sourceChunks, sources } from "@/db/schema";
 
-import type { SourceChunkStore } from "./markdown-importer";
+import type { SourceChunkStore } from "./source-chunks";
 
 export class DrizzleSourceChunkStore implements SourceChunkStore {
   constructor(private readonly database: Database) {}
@@ -39,6 +39,7 @@ export class DrizzleSourceChunkStore implements SourceChunkStore {
       chunks.map((chunk) => ({
         sourceId,
         position: chunk.position,
+        pageNumber: chunk.pageNumber,
         heading: chunk.heading,
         content: chunk.content,
         checksum: chunk.checksum,

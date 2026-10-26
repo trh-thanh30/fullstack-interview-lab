@@ -1,14 +1,8 @@
 import { createHash } from "node:crypto";
 
-import type { SourceMetadata } from "@/db/schema";
+import type { SourceChunkDraft } from "./source-chunks";
 
-export type MarkdownChunk = {
-  position: number;
-  heading: string | null;
-  content: string;
-  checksum: string;
-  metadata: SourceMetadata;
-};
+export type MarkdownChunk = SourceChunkDraft;
 
 type MutableSection = {
   heading: string | null;
@@ -160,6 +154,7 @@ function createChunk(section: MutableSection, position: number, filePath?: strin
 
   return {
     position,
+    pageNumber: null,
     heading: section.heading,
     content,
     checksum,

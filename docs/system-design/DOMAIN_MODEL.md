@@ -44,6 +44,16 @@ erDiagram
 - Source đã `processed` với checksum không đổi được bỏ qua. File thay đổi được parse lại và thay thế toàn bộ chunks.
 - Lỗi một file chuyển source đó sang `failed` nhưng không dừng các file còn lại trong batch.
 
+## PDF ingestion
+
+- PDF ingestion là local CLI workflow và gọi Poppler `pdftotext -layout -enc UTF-8`; không chạy binary trong request hoặc Vercel Function.
+- Form-feed từ `pdftotext` giữ ranh giới và page number gốc. Mỗi trang có text tạo một `source_chunk`.
+- Header/footer được nhận diện từ các dòng ở margin xuất hiện trên ít nhất 30% số trang có nội dung, với ngưỡng tối thiểu ba trang.
+- Pure page-number lines và repeated margin lines bị loại; indentation, bullet và line break còn lại được giữ.
+- Heading được suy luận từ các text block ngắn ở đầu trang. Không có tín hiệu đủ mạnh thì `heading` để `null` thay vì đoán.
+- Quality score dựa trên lượng text, readable-character ratio và replacement characters; trang yếu được gắn `reviewRequired` cùng lý do.
+- PDF source dùng chung checksum registry, atomic chunk replacement và per-file failure isolation với Markdown pipeline.
+
 ## Migration và seed
 
 ```bash

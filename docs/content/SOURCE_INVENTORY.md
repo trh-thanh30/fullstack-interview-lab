@@ -50,3 +50,12 @@ Importer ban đầu chỉ quét các directory đã phê duyệt:
 - `devops/docker`
 
 Allowlist hiện có 8 file Markdown, bao gồm đầy đủ năm README bắt buộc. Kết quả parse kiểm chứng là 322 section chunks với checksum duy nhất trong từng source. Các directory khác trong kho sẽ được thêm có chủ đích sau khi kiểm tra chất lượng và quyền sử dụng.
+
+## PDF allowlist của ING-003
+
+PDF importer chỉ nhận hai filename tại root của thư mục e-book:
+
+- `Kiến trúc ứng dụng web.pdf`
+- `system-degisn.pdf`
+
+`TranHuuThanhCV.pdf` không nằm trong allowlist nên không thể bị import nhầm. Kết quả `pdftotext -layout` thực tế tạo 59 chunks cho ebook kiến trúc và 93 chunks cho system design. Trang cover/trống không tạo chunk nhưng page number gốc vẫn được giữ; vì vậy chunk đầu tiên của cả hai tài liệu có `pageNumber = 2`.

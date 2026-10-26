@@ -1,17 +1,15 @@
 import { readFile } from "node:fs/promises";
 
 import { createFileSourceInput } from "./file-sources";
-import { parseMarkdownIntoChunks, type MarkdownChunk } from "./markdown-parser";
+import { parseMarkdownIntoChunks } from "./markdown-parser";
 import {
   registerSource,
   type SourceRecord,
   type SourceRegistryStore,
 } from "./source-registry";
+import type { SourceChunkStore } from "./source-chunks";
 
-export interface SourceChunkStore {
-  replaceSourceChunks(sourceId: string, chunks: MarkdownChunk[], importedAt: Date): Promise<void>;
-  markSourceFailed(sourceId: string, errorMessage: string, failedAt: Date): Promise<void>;
-}
+export type { SourceChunkStore } from "./source-chunks";
 
 export type MarkdownImportResult =
   | { action: "imported"; path: string; source: SourceRecord; chunkCount: number }
