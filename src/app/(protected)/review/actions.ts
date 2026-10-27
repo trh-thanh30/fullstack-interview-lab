@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getDatabase } from "@/db/client";
+import { questionReviewActionValues } from "@/db/schema";
 import { requireAuthenticatedUser } from "@/lib/auth/dal";
 import { getRequiredEnv } from "@/lib/env";
 import {
@@ -104,4 +105,49 @@ export async function generateQuestionAction(
 
   revalidatePath("/review");
   redirect(`/review/${generatedQuestionId}/edit?generated=1`);
+}
+
+export type ReviewQuestionState = {
+  message: string;
+  success?: boolean;
+};
+
+const reviewActionSchema = z.object({
+  questionId: z.uuid(),
+  reviewAction: z.enum(questionReviewActionValues),
+  reason: z.string().trim().max(500).optional(),
+  mergedIntoQuestionId: z.union([z.uuid(), z.literal("")]).optional(),
+});
+
+export async function reviewQuestionAction(
+  _previousState: ReviewQuestionState,
+  formData: FormData,
+): Promise<ReviewQuestionState> {
+  const user = await requireAuthenticatedUser();
+  const parsed = reviewActionSchema.safeParse({
+    questionId: formData.get("questionId"),
+    reviewAction: formData.get("reviewAction"),
+    reason: formData.get("reason") ?? undefined,
+    mergedIntoQuestionId: formData.get("mergedIntoQuestionId") ?? undefined,
+  });
+
+  if (!parsed.success) return { message: "Review action không hợp lệ." };
+
+  try {
+    await new QuestionStore(getDatabase()).review({
+      questionId: parsed.data.questionId,
+      reviewerUserId: user.id,
+      action: parsed.data.reviewAction,
+      reason: parsed.data.reason,
+      mergedIntoQuestionId: parsed.data.mergedIntoQuestionId || undefined,
+    });
+  } catch (error) {
+    return {
+      message: error instanceof Error ? error.message : "Không thể hoàn tất review.",
+    };
+  }
+
+  revalidatePath("/review");
+  revalidatePath("/review/queue");
+  return { message: "Đã lưu quyết định review.", success: true };
 }

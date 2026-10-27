@@ -22,6 +22,8 @@ erDiagram
   source_chunks ||--o{ question_sources : supports
   questions ||--o{ question_sources : cites
   questions ||--o| question_generation_runs : generated_by
+  questions ||--o{ question_review_events : reviewed_through
+  users ||--o{ question_review_events : performs
   interview_sessions ||--o{ session_questions : snapshots
   questions o|--o{ session_questions : originates
   session_questions ||--o{ answers : attempts
@@ -47,6 +49,14 @@ erDiagram
 - Generated question luôn được ghi với `status = draft` và `is_manual = false`. Provider không nhận lifecycle status và không có quyền publish.
 - Việc tạo question, source links, choices/rubric và `question_generation_runs` nằm trong cùng transaction. Audit lưu provider response ID, model, prompt version và token usage, không lưu lại response thô.
 - Prompt coi source content là dữ liệu không tin cậy, không phải instruction; request đặt `store: false` và giới hạn tổng context nguồn.
+
+## Question review workflow
+
+- Review queue lấy các question ở trạng thái `draft` hoặc `reviewed`, cũ nhất trước để tránh draft bị bỏ quên.
+- Approve chuyển question sang `published`; reject và merge chuyển sang `archived`; mark outdated chuyển sang `outdated`. Mọi decision cập nhật reviewer và `last_reviewed_at`.
+- `question_review_events` là audit append-only, giữ action, status trước/sau, reason và canonical question khi merge.
+- Reject yêu cầu reason tối thiểu 5 ký tự. Merge target phải còn hoạt động, cùng topic và đạt ngưỡng lexical similarity với source question.
+- Similarity warning dùng Dice coefficient trên tập token đã Unicode-normalize. Đây là tín hiệu hỗ trợ reviewer, không tự động merge hoặc loại dữ liệu.
 
 ## Markdown ingestion
 

@@ -119,6 +119,81 @@ describe("QuestionStore lifecycle", () => {
     });
   });
 
+  it("reviews drafts with publish metadata and an append-only decision audit", async () => {
+    const approvedId = await generatedDraft("resp-review-approve");
+    const reviewedAt = new Date("2026-10-27T03:00:00Z");
+
+    const queue = await store.listReviewQueue();
+    expect(queue.find(({ id }) => id === approvedId)).toMatchObject({
+      generationModel: "test-model",
+      sources: [expect.objectContaining({ id: sourceChunkId })],
+    });
+
+    await store.review({
+      questionId: approvedId,
+      reviewerUserId: userId,
+      action: "approve",
+      now: reviewedAt,
+    });
+    expect(await store.findById(approvedId)).toMatchObject({
+      status: "published",
+      reviewedByUserId: userId,
+      lastReviewedAt: reviewedAt,
+    });
+
+    const rejectedId = await generatedDraft("resp-review-reject");
+    await expect(store.review({
+      questionId: rejectedId,
+      reviewerUserId: userId,
+      action: "reject",
+      reason: "no",
+    })).rejects.toThrow("5 ký tự");
+    await store.review({
+      questionId: rejectedId,
+      reviewerUserId: userId,
+      action: "reject",
+      reason: "Nội dung không chính xác.",
+    });
+
+    const outdatedId = await generatedDraft("resp-review-outdated");
+    await store.review({ questionId: outdatedId, reviewerUserId: userId, action: "mark_outdated" });
+
+    const mergedId = await generatedDraft("resp-review-merge");
+    await store.review({
+      questionId: mergedId,
+      reviewerUserId: userId,
+      action: "merge",
+      mergedIntoQuestionId: approvedId,
+    });
+
+    const decisions = await client.query<{
+      question_id: string;
+      action: string;
+      reason: string | null;
+      merged_into_question_id: string | null;
+    }>("SELECT question_id, action, reason, merged_into_question_id FROM question_review_events ORDER BY created_at");
+    expect(decisions.rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({ question_id: approvedId, action: "approve" }),
+      expect.objectContaining({ question_id: rejectedId, action: "reject", reason: "Nội dung không chính xác." }),
+      expect.objectContaining({ question_id: outdatedId, action: "mark_outdated" }),
+      expect.objectContaining({ question_id: mergedId, action: "merge", merged_into_question_id: approvedId }),
+    ]));
+  });
+
+  async function generatedDraft(providerResponseId: string) {
+    return store.createGeneratedDraft({
+      question: { ...mcqInput(), status: "draft" },
+      userId,
+      generation: {
+        providerResponseId,
+        model: "test-model",
+        promptVersion: "qb-002-v1",
+        inputTokens: 10,
+        outputTokens: 20,
+      },
+    });
+  }
+
   function mcqInput(): QuestionWriteInput {
     return {
       topicId,

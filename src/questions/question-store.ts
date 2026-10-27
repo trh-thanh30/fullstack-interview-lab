@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
 
-import { and, asc, desc, eq, inArray, isNotNull, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, ne, sql, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/db/client";
 import {
   questionChoices,
   questionGenerationRuns,
+  questionReviewActionValues,
+  questionReviewEvents,
   questionSources,
   questionTechnologies,
   questions,
@@ -15,10 +17,14 @@ import {
   sources,
   technologies,
   topics,
+  users,
 } from "@/db/schema";
 
 import type { QuestionWriteInput } from "./question-form";
 import type { QuestionGenerationRepository } from "./question-generation";
+import { findSimilarQuestions, promptSimilarity } from "./question-review";
+
+export type QuestionReviewAction = (typeof questionReviewActionValues)[number];
 
 export type QuestionFilters = {
   topicId?: string;
@@ -185,6 +191,161 @@ export class QuestionStore implements QuestionGenerationRepository {
       .orderBy(asc(sources.title), asc(sourceChunks.position));
   }
 
+  async listReviewQueue() {
+    const queue = await this.database
+      .select({
+        id: questions.id,
+        topicId: questions.topicId,
+        topicName: topics.name,
+        prompt: questions.prompt,
+        explanation: questions.explanation,
+        type: questions.type,
+        level: questions.level,
+        status: questions.status,
+        version: questions.version,
+        isManual: questions.isManual,
+        updatedAt: questions.updatedAt,
+        generationModel: questionGenerationRuns.model,
+      })
+      .from(questions)
+      .innerJoin(topics, eq(questions.topicId, topics.id))
+      .leftJoin(questionGenerationRuns, eq(questionGenerationRuns.questionId, questions.id))
+      .where(inArray(questions.status, ["draft", "reviewed"]))
+      .orderBy(asc(questions.createdAt));
+
+    if (!queue.length) return [];
+    const ids = queue.map(({ id }) => id);
+    const [choiceRows, rubricRows, sourceRows, reviewRows, comparableRows] = await Promise.all([
+      this.database
+        .select()
+        .from(questionChoices)
+        .where(inArray(questionChoices.questionId, ids))
+        .orderBy(asc(questionChoices.position)),
+      this.database
+        .select()
+        .from(rubrics)
+        .where(inArray(rubrics.questionId, ids))
+        .orderBy(desc(rubrics.version)),
+      this.database
+        .select({
+          questionId: questionSources.questionId,
+          id: sourceChunks.id,
+          heading: sourceChunks.heading,
+          pageNumber: sourceChunks.pageNumber,
+          excerpt: sql<string>`left(${sourceChunks.content}, 2_000)`,
+          sourceTitle: sources.title,
+          isPrimary: questionSources.isPrimary,
+        })
+        .from(questionSources)
+        .innerJoin(sourceChunks, eq(questionSources.sourceChunkId, sourceChunks.id))
+        .innerJoin(sources, eq(sourceChunks.sourceId, sources.id))
+        .where(inArray(questionSources.questionId, ids))
+        .orderBy(desc(questionSources.isPrimary), asc(sourceChunks.position)),
+      this.database
+        .select({
+          questionId: questionReviewEvents.questionId,
+          action: questionReviewEvents.action,
+          reason: questionReviewEvents.reason,
+          createdAt: questionReviewEvents.createdAt,
+          reviewerName: users.name,
+          reviewerEmail: users.email,
+        })
+        .from(questionReviewEvents)
+        .innerJoin(users, eq(questionReviewEvents.reviewerUserId, users.id))
+        .where(inArray(questionReviewEvents.questionId, ids))
+        .orderBy(desc(questionReviewEvents.createdAt)),
+      this.database
+        .select({
+          id: questions.id,
+          prompt: questions.prompt,
+          topicId: questions.topicId,
+          status: questions.status,
+        })
+        .from(questions)
+        .where(ne(questions.status, "archived")),
+    ]);
+
+    return queue.map((question) => ({
+      ...question,
+      choices: choiceRows.filter(({ questionId }) => questionId === question.id),
+      rubric: rubricRows.find(({ questionId }) => questionId === question.id) ?? null,
+      sources: sourceRows.filter(({ questionId }) => questionId === question.id),
+      latestReview: reviewRows.find(({ questionId }) => questionId === question.id) ?? null,
+      similarQuestions: findSimilarQuestions(question, comparableRows),
+    }));
+  }
+
+  async review(input: {
+    questionId: string;
+    reviewerUserId: string;
+    action: QuestionReviewAction;
+    reason?: string;
+    mergedIntoQuestionId?: string;
+    now?: Date;
+  }) {
+    const now = input.now ?? new Date();
+    const current = await this.findById(input.questionId);
+    if (!current) throw new Error("Question not found.");
+    if (current.status !== "draft" && current.status !== "reviewed") {
+      throw new Error("Question không còn nằm trong review queue.");
+    }
+
+    const submittedReason = input.reason?.trim() || null;
+    if (input.action === "reject" && (!submittedReason || submittedReason.length < 5)) {
+      throw new Error("Reject cần lý do ít nhất 5 ký tự.");
+    }
+    const reason = input.action === "reject" ? submittedReason : null;
+
+    let mergedIntoQuestionId: string | null = null;
+    if (input.action === "merge") {
+      if (!input.mergedIntoQuestionId || input.mergedIntoQuestionId === input.questionId) {
+        throw new Error("Hãy chọn một câu hỏi khác để merge.");
+      }
+      const [target] = await this.database
+        .select({ id: questions.id, prompt: questions.prompt, topicId: questions.topicId })
+        .from(questions)
+        .where(and(
+          eq(questions.id, input.mergedIntoQuestionId),
+          ne(questions.status, "archived"),
+        ))
+        .limit(1);
+      if (!target) throw new Error("Câu hỏi đích không tồn tại hoặc đã archive.");
+      if (target.topicId !== current.topicId || promptSimilarity(current.prompt, target.prompt) < 0.42) {
+        throw new Error("Câu hỏi đích không đủ tương đồng để merge.");
+      }
+      mergedIntoQuestionId = target.id;
+    }
+
+    if (input.action === "approve") assertPublishable(current);
+    const nextStatus = input.action === "approve"
+      ? "published" as const
+      : input.action === "mark_outdated"
+        ? "outdated" as const
+        : "archived" as const;
+
+    await this.database.batch([
+      this.database
+        .update(questions)
+        .set({
+          status: nextStatus,
+          reviewedByUserId: input.reviewerUserId,
+          lastReviewedAt: now,
+          updatedAt: now,
+        })
+        .where(eq(questions.id, input.questionId)),
+      this.database.insert(questionReviewEvents).values({
+        questionId: input.questionId,
+        reviewerUserId: input.reviewerUserId,
+        action: input.action,
+        previousStatus: current.status,
+        newStatus: nextStatus,
+        reason,
+        mergedIntoQuestionId,
+        createdAt: now,
+      }),
+    ]);
+  }
+
   async create(input: QuestionWriteInput, userId: string, now = new Date()) {
     return this.createWithGeneration(input, userId, now);
   }
@@ -334,5 +495,18 @@ export class QuestionStore implements QuestionGenerationRepository {
     }
 
     return statements;
+  }
+}
+
+function assertPublishable(question: NonNullable<Awaited<ReturnType<QuestionStore["findById"]>>>) {
+  if (!question.isManual && question.sourceChunkIds.length === 0) {
+    throw new Error("Câu hỏi cần source trước khi approve.");
+  }
+  if (question.type === "mcq") {
+    if (question.choices.length < 2 || question.choices.filter(({ isCorrect }) => isCorrect).length !== 1) {
+      throw new Error("MCQ cần ít nhất hai lựa chọn và đúng một đáp án đúng.");
+    }
+  } else if (!question.rubric || question.rubric.dimensions.length < 4) {
+    throw new Error("Câu tự luận cần rubric đầy đủ trước khi approve.");
   }
 }

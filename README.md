@@ -129,11 +129,11 @@ Domain model và các quyết định persistence nằm tại [DOMAIN_MODEL.md](
 
 ## Question bank
 
-Sau khi đăng nhập, mở `/review` để lọc, tạo, sửa, preview, publish hoặc archive câu hỏi. Mở `/review/generate` để tạo AI draft từ 1–5 source chunks đã xử lý. Published MCQ bắt buộc có đáp án đúng; câu tự luận bắt buộc có rubric; mọi câu published phải liên kết source chunk hoặc được đánh dấu manual.
+Sau khi đăng nhập, mở `/review` để lọc, tạo, sửa, preview, publish hoặc archive câu hỏi. Mở `/review/generate` để tạo AI draft từ 1–5 source chunks đã xử lý và `/review/queue` để duyệt liên tục bằng keyboard. Published MCQ bắt buộc có đáp án đúng; câu tự luận bắt buộc có rubric; mọi câu published phải liên kết source chunk hoặc được đánh dấu manual.
 
 AI generation cần `OPENAI_API_KEY` và `OPENAI_QUESTION_MODEL`. Generated question luôn là draft để người dùng review trước khi publish.
 
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Card vừa hoàn thành: QB-002](./docs/roadmap/phase-2-question-bank/QB-002.md)
+- [Card vừa hoàn thành: QB-003](./docs/roadmap/phase-2-question-bank/QB-003.md)

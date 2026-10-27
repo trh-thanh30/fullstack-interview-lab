@@ -11,7 +11,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { questionLevelEnum, questionStatusEnum, questionTypeEnum } from "./enums";
+import {
+  questionLevelEnum,
+  questionReviewActionEnum,
+  questionStatusEnum,
+  questionTypeEnum,
+} from "./enums";
 import { sourceChunks, technologies, topics } from "./content";
 import { users } from "./identity";
 
@@ -153,5 +158,38 @@ export const questionGenerationRuns = pgTable(
   (table) => [
     uniqueIndex("question_generation_runs_question_id_unique").on(table.questionId),
     index("question_generation_runs_model_created_at_idx").on(table.model, table.createdAt),
+  ],
+);
+
+export const questionReviewEvents = pgTable(
+  "question_review_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    reviewerUserId: uuid("reviewer_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    action: questionReviewActionEnum("action").notNull(),
+    previousStatus: questionStatusEnum("previous_status").notNull(),
+    newStatus: questionStatusEnum("new_status").notNull(),
+    reason: text("reason"),
+    mergedIntoQuestionId: uuid("merged_into_question_id")
+      .references(() => questions.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("question_review_events_question_created_at_idx").on(
+      table.questionId,
+      table.createdAt,
+    ),
+    index("question_review_events_reviewer_created_at_idx").on(
+      table.reviewerUserId,
+      table.createdAt,
+    ),
+    index("question_review_events_merged_into_idx").on(table.mergedIntoQuestionId),
   ],
 );

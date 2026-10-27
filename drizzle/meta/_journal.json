@@ -29,6 +29,13 @@
       "when": 1793110807765,
       "tag": "0003_lumpy_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793111419070,
+      "tag": "0004_powerful_rhino",
+      "breakpoints": true
     }
   ]
 }

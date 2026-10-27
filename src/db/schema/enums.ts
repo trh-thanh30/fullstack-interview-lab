@@ -18,6 +18,13 @@ export const questionStatusValues = [
   "archived",
 ] as const;
 
+export const questionReviewActionValues = [
+  "approve",
+  "reject",
+  "merge",
+  "mark_outdated",
+] as const;
+
 export const sessionModeValues = [
   "mcq",
   "short_answer",
@@ -52,6 +59,10 @@ export const duplicateReviewStatusValues = ["pending", "confirmed", "dismissed"]
 export const questionTypeEnum = pgEnum("question_type", questionTypeValues);
 export const questionLevelEnum = pgEnum("question_level", questionLevelValues);
 export const questionStatusEnum = pgEnum("question_status", questionStatusValues);
+export const questionReviewActionEnum = pgEnum(
+  "question_review_action",
+  questionReviewActionValues,
+);
 export const sessionModeEnum = pgEnum("session_mode", sessionModeValues);
 export const sessionStateEnum = pgEnum("session_state", sessionStateValues);
 export const sourceTypeEnum = pgEnum("source_type", sourceTypeValues);

@@ -54,6 +54,7 @@ describe("initial database migration", () => {
         "questions",
         "question_choices",
         "question_generation_runs",
+        "question_review_events",
         "rubrics",
         "sources",
         "source_chunks",
