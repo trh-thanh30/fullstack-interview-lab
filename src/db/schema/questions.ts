@@ -34,6 +34,7 @@ export const questions = pgTable(
     status: questionStatusEnum("status").default("draft").notNull(),
     prompt: text("prompt").notNull(),
     explanation: text("explanation"),
+    isManual: boolean("is_manual").default(false).notNull(),
     version: integer("version").default(1).notNull(),
     createdByUserId: uuid("created_by_user_id").references(() => users.id, {
       onDelete: "set null",

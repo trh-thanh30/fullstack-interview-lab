@@ -127,7 +127,11 @@ Design system dùng shadcn/ui `base-nova`, Tailwind CSS v4 và Base UI primitive
 
 Domain model và các quyết định persistence nằm tại [DOMAIN_MODEL.md](./docs/system-design/DOMAIN_MODEL.md).
 
+## Question bank
+
+Sau khi đăng nhập, mở `/review` để lọc, tạo, sửa, preview, publish hoặc archive câu hỏi. Published MCQ bắt buộc có đáp án đúng; câu tự luận bắt buộc có rubric; mọi câu published phải liên kết source chunk hoặc được đánh dấu manual.
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Card vừa hoàn thành: ING-004](./docs/roadmap/phase-1-content-ingestion/ING-004.md)
+- [Card vừa hoàn thành: QB-001](./docs/roadmap/phase-2-question-bank/QB-001.md)

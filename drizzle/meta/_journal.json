@@ -15,6 +15,13 @@
       "when": 1793014599092,
       "tag": "0001_flowery_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793093368486,
+      "tag": "0002_chemical_orphan",
+      "breakpoints": true
     }
   ]
 }

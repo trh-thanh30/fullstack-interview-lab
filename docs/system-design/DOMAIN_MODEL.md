@@ -32,6 +32,7 @@ erDiagram
 
 - UUID được sinh tại PostgreSQL để client không kiểm soát identifier.
 - Question dùng nhiều technology qua bảng nối, nhưng có đúng một topic chính.
+- Question lifecycle không hard delete; thao tác loại bỏ chuyển status sang `archived`. Cờ `is_manual` phân biệt câu do người quản trị tự biên soạn với câu phải liên kết source chunk.
 - Rubric và evaluation là versioned/append-only để đổi prompt hoặc model không phá lịch sử.
 - Session question lưu snapshot prompt, choices và rubric; chỉnh question bank không làm thay đổi session đang chạy.
 - Source và source chunk có checksum/position unique để ingestion chạy lại an toàn.

@@ -1,0 +1,1 @@
+ALTER TABLE "questions" ADD COLUMN "is_manual" boolean DEFAULT false NOT NULL;

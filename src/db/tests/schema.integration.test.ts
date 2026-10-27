@@ -117,4 +117,15 @@ describe("initial database migration", () => {
       `),
     ).rejects.toThrow();
   });
+
+  it("supports explicit manual provenance for question publishing", async () => {
+    const columns = await client.query<{ column_name: string; column_default: string | null }>(`
+      SELECT column_name, column_default
+      FROM information_schema.columns
+      WHERE table_name = 'questions' AND column_name = 'is_manual'
+    `);
+
+    expect(columns.rows[0]?.column_name).toBe("is_manual");
+    expect(columns.rows[0]?.column_default).toContain("false");
+  });
 });

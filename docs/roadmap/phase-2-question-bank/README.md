@@ -8,7 +8,7 @@ Tạo ngân hàng câu hỏi có version, rubric, nguồn dẫn và quy trình k
 
 ## Cards
 
-- [ ] [QB-001 — Question CRUD](./QB-001.md)
+- [x] [QB-001 — Question CRUD](./QB-001.md)
 - [ ] [QB-002 — AI-assisted question generation](./QB-002.md)
 - [ ] [QB-003 — Review queue](./QB-003.md)
 
