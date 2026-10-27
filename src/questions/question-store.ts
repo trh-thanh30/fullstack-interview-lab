@@ -1,21 +1,24 @@
 import { randomUUID } from "node:crypto";
 
-import { and, asc, desc, eq, inArray, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, sql, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/db/client";
 import {
   questionChoices,
+  questionGenerationRuns,
   questionSources,
   questionTechnologies,
   questions,
   rubrics,
   sourceChunks,
+  sourceChunkTechnologies,
   sources,
   technologies,
   topics,
 } from "@/db/schema";
 
 import type { QuestionWriteInput } from "./question-form";
+import type { QuestionGenerationRepository } from "./question-generation";
 
 export type QuestionFilters = {
   topicId?: string;
@@ -25,7 +28,7 @@ export type QuestionFilters = {
   status?: QuestionWriteInput["status"];
 };
 
-export class QuestionStore {
+export class QuestionStore implements QuestionGenerationRepository {
   constructor(private readonly database: Database) {}
 
   async list(filters: QuestionFilters = {}) {
@@ -122,9 +125,103 @@ export class QuestionStore {
     };
   }
 
+  async getGenerationSources(sourceChunkIds: string[]) {
+    if (sourceChunkIds.length === 0) return [];
+
+    const [chunkRows, technologyRows] = await Promise.all([
+      this.database
+        .select({
+          id: sourceChunks.id,
+          topicId: sourceChunks.topicId,
+          sourceTitle: sources.title,
+          heading: sourceChunks.heading,
+          pageNumber: sourceChunks.pageNumber,
+          content: sourceChunks.content,
+        })
+        .from(sourceChunks)
+        .innerJoin(sources, eq(sourceChunks.sourceId, sources.id))
+        .where(
+          and(
+            inArray(sourceChunks.id, sourceChunkIds),
+            eq(sources.status, "processed"),
+          ),
+        ),
+      this.database
+        .select({
+          sourceChunkId: sourceChunkTechnologies.sourceChunkId,
+          technologyId: sourceChunkTechnologies.technologyId,
+        })
+        .from(sourceChunkTechnologies)
+        .where(inArray(sourceChunkTechnologies.sourceChunkId, sourceChunkIds)),
+    ]);
+    const chunksById = new Map(chunkRows.map((chunk) => [chunk.id, chunk]));
+
+    return sourceChunkIds.flatMap((id) => {
+      const chunk = chunksById.get(id);
+      if (!chunk) return [];
+      return [{
+        ...chunk,
+        technologyIds: technologyRows
+          .filter((row) => row.sourceChunkId === id)
+          .map((row) => row.technologyId),
+      }];
+    });
+  }
+
+  async listGenerationSourceOptions() {
+    return this.database
+      .select({
+        id: sourceChunks.id,
+        heading: sourceChunks.heading,
+        pageNumber: sourceChunks.pageNumber,
+        excerpt: sql<string>`left(${sourceChunks.content}, 360)`,
+        topicName: topics.name,
+        sourceTitle: sources.title,
+      })
+      .from(sourceChunks)
+      .innerJoin(sources, eq(sourceChunks.sourceId, sources.id))
+      .innerJoin(topics, eq(sourceChunks.topicId, topics.id))
+      .where(and(eq(sources.status, "processed"), isNotNull(sourceChunks.topicId)))
+      .orderBy(asc(sources.title), asc(sourceChunks.position));
+  }
+
   async create(input: QuestionWriteInput, userId: string, now = new Date()) {
+    return this.createWithGeneration(input, userId, now);
+  }
+
+  async createGeneratedDraft(
+    input: Parameters<QuestionGenerationRepository["createGeneratedDraft"]>[0],
+  ) {
+    return this.createWithGeneration(
+      { ...input.question, status: "draft", isManual: false },
+      input.userId,
+      new Date(),
+      input.generation,
+    );
+  }
+
+  private async createWithGeneration(
+    input: QuestionWriteInput,
+    userId: string,
+    now: Date,
+    generation?: Parameters<QuestionGenerationRepository["createGeneratedDraft"]>[0]["generation"],
+  ) {
     const id = randomUUID();
     const statements = this.buildRelatedInsertStatements(id, 1, input, now);
+
+    const generationStatements = generation
+      ? [
+          this.database.insert(questionGenerationRuns).values({
+            questionId: id,
+            providerResponseId: generation.providerResponseId,
+            model: generation.model,
+            promptVersion: generation.promptVersion,
+            inputTokens: generation.inputTokens,
+            outputTokens: generation.outputTokens,
+            createdAt: now,
+          }),
+        ]
+      : [];
 
     await this.database.batch([
       this.database.insert(questions).values({
@@ -144,6 +241,7 @@ export class QuestionStore {
         updatedAt: now,
       }),
       ...statements,
+      ...generationStatements,
     ]);
 
     return id;

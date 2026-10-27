@@ -1,4 +1,4 @@
-import { BookOpenCheck, Filter, Plus, SearchX } from 'lucide-react';
+import { BookOpenCheck, Filter, Plus, SearchX, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
@@ -30,13 +30,10 @@ export default function ReviewPage({ searchParams }: PageProps<'/review'>) {
             publish.
           </p>
         </div>
-        <Link
-          className={cn(buttonVariants({ size: 'lg' }), 'h-11 rounded-full px-5')}
-          href="/review/new"
-        >
-          <Plus />
-          Tạo câu hỏi
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'h-11 rounded-full px-5')} href="/review/generate"><Sparkles />AI generate</Link>
+          <Link className={cn(buttonVariants({ size: 'lg' }), 'h-11 rounded-full px-5')} href="/review/new"><Plus />Tạo câu hỏi</Link>
+        </div>
       </section>
       <Suspense fallback={<QuestionListSkeleton />}>
         <QuestionBankContent searchParams={searchParams} />

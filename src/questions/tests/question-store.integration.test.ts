@@ -46,9 +46,13 @@ describe("QuestionStore lifecycle", () => {
       VALUES ('10000000-0000-4000-8000-000000000001', 'manual', 'processed', 'Node source', 'manual://node', 'source-checksum')
     `);
     await client.query(`
-      INSERT INTO source_chunks (id, source_id, position, content, checksum)
-      VALUES ($1, '10000000-0000-4000-8000-000000000001', 0, 'Event loop source', 'chunk-checksum')
-    `, [sourceChunkId]);
+      INSERT INTO source_chunks (id, source_id, topic_id, position, content, checksum)
+      VALUES ($1, '10000000-0000-4000-8000-000000000001', $2, 0, 'Event loop source', 'chunk-checksum')
+    `, [sourceChunkId, topicId]);
+    await client.query(`
+      INSERT INTO source_chunk_technologies (source_chunk_id, technology_id)
+      VALUES ($1, $2)
+    `, [sourceChunkId, technologyId]);
     Object.assign(database, {
       batch: async (statements: Array<{ execute(): Promise<unknown> }>) => {
         const results = [];
@@ -79,6 +83,40 @@ describe("QuestionStore lifecycle", () => {
 
     await store.archive(id, new Date("2026-10-27T02:00:00Z"));
     expect(await store.findById(id)).toMatchObject({ status: "archived" });
+  });
+
+  it("persists AI generation audit and forces generated questions to draft", async () => {
+    const sources = await store.getGenerationSources([sourceChunkId]);
+    expect(sources[0]).toMatchObject({ topicId, technologyIds: [technologyId] });
+
+    const id = await store.createGeneratedDraft({
+      question: { ...mcqInput(), status: "published", isManual: true },
+      userId,
+      generation: {
+        providerResponseId: "resp-qb-002",
+        model: "test-model",
+        promptVersion: "qb-002-v1",
+        inputTokens: 123,
+        outputTokens: 45,
+      },
+    });
+    const question = await store.findById(id);
+    const runs = await client.query<{
+      question_id: string;
+      model: string;
+      prompt_version: string;
+      input_tokens: number;
+      output_tokens: number;
+    }>("SELECT question_id, model, prompt_version, input_tokens, output_tokens FROM question_generation_runs WHERE question_id = $1", [id]);
+
+    expect(question).toMatchObject({ status: "draft", isManual: false });
+    expect(runs.rows[0]).toEqual({
+      question_id: id,
+      model: "test-model",
+      prompt_version: "qb-002-v1",
+      input_tokens: 123,
+      output_tokens: 45,
+    });
   });
 
   function mcqInput(): QuestionWriteInput {

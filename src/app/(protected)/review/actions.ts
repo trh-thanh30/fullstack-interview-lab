@@ -2,13 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 import { getDatabase } from "@/db/client";
 import { requireAuthenticatedUser } from "@/lib/auth/dal";
+import { getRequiredEnv } from "@/lib/env";
 import {
+  editableQuestionTypeValues,
   parseQuestionFormData,
   type QuestionFormState,
 } from "@/questions/question-form";
+import { generateQuestionDraft } from "@/questions/question-generation";
+import { OpenAIQuestionGenerationProvider } from "@/questions/openai-question-generation-provider";
 import { QuestionStore } from "@/questions/question-store";
 
 export async function createQuestionAction(
@@ -44,4 +49,59 @@ export async function archiveQuestionAction(questionId: string) {
   await new QuestionStore(getDatabase()).archive(questionId);
   revalidatePath("/review");
   redirect("/review?archived=1");
+}
+
+export type GenerateQuestionState = {
+  message: string;
+  fieldErrors?: Record<string, string[]>;
+};
+
+export async function generateQuestionAction(
+  _previousState: GenerateQuestionState,
+  formData: FormData,
+): Promise<GenerateQuestionState> {
+  const user = await requireAuthenticatedUser();
+  const parsed = z.object({
+    type: z.enum(editableQuestionTypeValues),
+    sourceChunkIds: z.array(z.uuid()).min(1, "Chọn ít nhất một source chunk.").max(5),
+  }).safeParse({
+    type: formData.get("type"),
+    sourceChunkIds: formData.getAll("sourceChunkIds"),
+  });
+
+  if (!parsed.success) {
+    return {
+      message: "Hãy kiểm tra loại câu hỏi và source đã chọn.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  let generatedQuestionId: string;
+
+  try {
+    const repository = new QuestionStore(getDatabase());
+    const provider = new OpenAIQuestionGenerationProvider(
+      getRequiredEnv("OPENAI_API_KEY"),
+      getRequiredEnv("OPENAI_QUESTION_MODEL"),
+    );
+    const result = await generateQuestionDraft({
+      repository,
+      provider,
+      sourceChunkIds: parsed.data.sourceChunkIds,
+      type: parsed.data.type,
+      userId: user.id,
+    });
+
+    generatedQuestionId = result.id;
+  } catch (error) {
+    const message = error instanceof Error && (
+      error.message.includes("source") || error.message.includes("AI output")
+    )
+      ? error.message
+      : "Không thể sinh câu hỏi lúc này. Hãy thử lại sau.";
+    return { message };
+  }
+
+  revalidatePath("/review");
+  redirect(`/review/${generatedQuestionId}/edit?generated=1`);
 }

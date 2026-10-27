@@ -21,6 +21,7 @@ erDiagram
   source_chunks ||--o{ source_duplicate_candidates : compares
   source_chunks ||--o{ question_sources : supports
   questions ||--o{ question_sources : cites
+  questions ||--o| question_generation_runs : generated_by
   interview_sessions ||--o{ session_questions : snapshots
   questions o|--o{ session_questions : originates
   session_questions ||--o{ answers : attempts
@@ -38,6 +39,14 @@ erDiagram
 - Source và source chunk có checksum/position unique để ingestion chạy lại an toàn.
 - Foreign key `restrict` bảo vệ taxonomy/source đang được tham chiếu; dữ liệu session phụ thuộc user dùng cascade.
 - Vector có 1536 chiều và HNSW cosine index; migration tạo extension `vector` trước khi tạo bảng.
+
+## AI-assisted question generation
+
+- Người dùng chọn từ một đến năm source chunks đã được xử lý và một loại câu hỏi; server mới tải toàn bộ nội dung nguồn để gửi cho model.
+- OpenAI Responses API dùng Structured Outputs được kiểm tra bằng Zod. Schema cơ sở và invariant riêng của MCQ/tự luận đều phải hợp lệ; lỗi output được retry tối đa hai lần.
+- Generated question luôn được ghi với `status = draft` và `is_manual = false`. Provider không nhận lifecycle status và không có quyền publish.
+- Việc tạo question, source links, choices/rubric và `question_generation_runs` nằm trong cùng transaction. Audit lưu provider response ID, model, prompt version và token usage, không lưu lại response thô.
+- Prompt coi source content là dữ liệu không tin cậy, không phải instruction; request đặt `store: false` và giới hạn tổng context nguồn.
 
 ## Markdown ingestion
 

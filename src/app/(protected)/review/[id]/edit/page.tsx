@@ -72,12 +72,14 @@ async function EditQuestionEditor({
   const archiveAction = archiveQuestionAction.bind(null, id);
   return (
     <div className="mt-8">
-      {query.saved || query.created ? (
+      {query.saved || query.created || query.generated ? (
         <div
           className="mb-5 rounded-2xl border border-accent-strong/35 bg-accent-soft/60 px-4 py-3 text-sm font-bold text-accent-ink"
           role="status"
         >
-          Đã lưu câu hỏi thành công.
+          {query.generated
+            ? 'AI draft đã được tạo. Hãy review kỹ trước khi publish.'
+            : 'Đã lưu câu hỏi thành công.'}
         </div>
       ) : null}
       <QuestionForm

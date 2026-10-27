@@ -133,3 +133,25 @@ export const questionSources = pgTable(
     index("question_sources_source_chunk_id_idx").on(table.sourceChunkId),
   ],
 );
+
+export const questionGenerationRuns = pgTable(
+  "question_generation_runs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    providerResponseId: text("provider_response_id").notNull(),
+    model: text("model").notNull(),
+    promptVersion: text("prompt_version").notNull(),
+    inputTokens: integer("input_tokens").notNull(),
+    outputTokens: integer("output_tokens").notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("question_generation_runs_question_id_unique").on(table.questionId),
+    index("question_generation_runs_model_created_at_idx").on(table.model, table.createdAt),
+  ],
+);
