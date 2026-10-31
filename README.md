@@ -133,7 +133,11 @@ Sau khi đăng nhập, mở `/review` để lọc, tạo, sửa, preview, publis
 
 AI generation cần `OPENAI_API_KEY` và `OPENAI_QUESTION_MODEL`. Generated question luôn là draft để người dùng review trước khi publish.
 
+## MCQ practice
+
+Mở `/practice` để lọc question `published`, bắt đầu một session có snapshot, resume sau refresh và xem debrief theo topic. Keyboard hỗ trợ chọn bằng `1–6`/`A–F`, submit bằng `Enter` và chuyển câu bằng `Enter` hoặc `N`. Result cũ mở lại được từ session history; câu sai có thể tạo thành một session retry riêng.
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Card vừa hoàn thành: QB-003](./docs/roadmap/phase-2-question-bank/QB-003.md)
+- [Card vừa hoàn thành: MCQ-004](./docs/roadmap/phase-3-quiz-mvp/MCQ-004.md)

@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -20,6 +21,15 @@ export type SessionConfig = {
   level?: (typeof questionLevelEnum.enumValues)[number];
   questionCount?: number;
   durationMinutes?: number;
+  strategy?: "random" | "weak_first";
+  retryOfSessionId?: string;
+};
+
+export type SessionSourceSnapshot = {
+  id: string;
+  sourceTitle: string;
+  heading: string | null;
+  pageNumber: number | null;
 };
 
 export type EvaluationDimensions = Record<string, number>;
@@ -61,8 +71,16 @@ export const sessionQuestions = pgTable(
     position: integer("position").notNull(),
     questionType: questionTypeEnum("question_type").notNull(),
     promptSnapshot: text("prompt_snapshot").notNull(),
+    explanationSnapshot: text("explanation_snapshot"),
+    topicIdSnapshot: uuid("topic_id_snapshot").notNull(),
+    topicNameSnapshot: text("topic_name_snapshot").notNull(),
     choicesSnapshot: jsonb("choices_snapshot")
       .$type<Array<{ id: string; content: string; position: number }>>()
+      .default([])
+      .notNull(),
+    answerKeySnapshot: jsonb("answer_key_snapshot").$type<string[]>().default([]).notNull(),
+    sourceSnapshot: jsonb("source_snapshot")
+      .$type<SessionSourceSnapshot[]>()
       .default([])
       .notNull(),
     rubricSnapshot: jsonb("rubric_snapshot").$type<Record<string, unknown> | null>(),
@@ -87,6 +105,7 @@ export const answers = pgTable(
     attemptNumber: integer("attempt_number").default(1).notNull(),
     answerText: text("answer_text"),
     selectedChoiceIds: jsonb("selected_choice_ids").$type<string[]>().default([]).notNull(),
+    isCorrect: boolean("is_correct"),
     submittedAt: timestamp("submitted_at", { mode: "date", withTimezone: true })
       .defaultNow()
       .notNull(),

@@ -25,7 +25,7 @@
 | [Phase 0](./phase-0-foundation/README.md) | Product baseline và kiến trúc | 4 | TODO |
 | [Phase 1](./phase-1-content-ingestion/README.md) | Content ingestion | 4 | TODO |
 | [Phase 2](./phase-2-question-bank/README.md) | Question bank và review | 3 | TODO |
-| [Phase 3](./phase-3-quiz-mvp/README.md) | Trắc nghiệm MVP | 4 | TODO |
+| [Phase 3](./phase-3-quiz-mvp/README.md) | Trắc nghiệm MVP | 4 | DONE |
 | [Phase 4](./phase-4-ai-essay/README.md) | Tự luận có AI đánh giá | 4 | TODO |
 | [Phase 5](./phase-5-mock-interview/README.md) | Mock interview thích ứng | 4 | TODO |
 | [Phase 6](./phase-6-system-design-coding/README.md) | System design và coding | 3 | TODO |

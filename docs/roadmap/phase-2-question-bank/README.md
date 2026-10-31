@@ -15,7 +15,7 @@ Tạo ngân hàng câu hỏi có version, rubric, nguồn dẫn và quy trình k
 ## Exit criteria
 
 - [x] Có thể tạo, sửa, preview, publish và archive câu hỏi.
-- [ ] Câu hỏi chưa review không xuất hiện trong practice.
+- [x] Câu hỏi chưa review không xuất hiện trong practice.
 - [ ] Có tối thiểu 20 câu hỏi đã duyệt cho luồng end-to-end.
 
 ## Điều hướng

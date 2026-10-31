@@ -58,6 +58,14 @@ erDiagram
 - Reject yêu cầu reason tối thiểu 5 ký tự. Merge target phải còn hoạt động, cùng topic và đạt ngưỡng lexical similarity với source question.
 - Similarity warning dùng Dice coefficient trên tập token đã Unicode-normalize. Đây là tín hiệu hỗ trợ reviewer, không tự động merge hoặc loại dữ liệu.
 
+## MCQ practice session
+
+- Practice configuration chỉ query question `published` có type `mcq`; category, technology, level, count và selection strategy đều được validate lại ở server.
+- Khi bắt đầu, session snapshot prompt, explanation, topic, choices đã xáo trộn, answer key và source metadata. Answer key nằm ở server DTO boundary và không được gửi trước submit.
+- Session persist current position và timestamps. Mỗi mutation kiểm tra user ownership, session state, current question và choice membership; unique `(session_question_id, attempt_number)` chặn double submit.
+- Chấm MCQ là deterministic server code. Result lấy score, duration và topic breakdown từ snapshot/answer rows, không gọi AI và không đọc lại nội dung question bank.
+- Retry câu sai tạo session độc lập mới và lưu `retryOfSessionId`; lịch sử cũ giữ nguyên append-only.
+
 ## Markdown ingestion
 
 - Markdown importer chỉ đọc directory nằm trong allowlist, canonicalize file path và đăng ký SHA-256 trước khi parse.
