@@ -27,8 +27,10 @@ erDiagram
   interview_sessions ||--o{ session_questions : snapshots
   questions o|--o{ session_questions : originates
   session_questions ||--o{ answers : attempts
+  session_questions ||--o| answer_drafts : autosaves
   answers ||--o{ evaluations : evaluated
   rubrics o|--o{ evaluations : applies
+  ai_calls ||--o| evaluations : traces
 ```
 
 ## Quyết định chính
@@ -45,10 +47,10 @@ erDiagram
 ## AI-assisted question generation
 
 - Người dùng chọn từ một đến năm source chunks đã được xử lý và một loại câu hỏi; server mới tải toàn bộ nội dung nguồn để gửi cho model.
-- OpenAI Responses API dùng Structured Outputs được kiểm tra bằng Zod. Schema cơ sở và invariant riêng của MCQ/tự luận đều phải hợp lệ; lỗi output được retry tối đa hai lần.
+- Gemini Structured Outputs qua Vercel AI SDK được kiểm tra bằng Zod. Schema cơ sở và invariant riêng của MCQ/tự luận đều phải hợp lệ; lỗi output được retry tối đa hai lần.
 - Generated question luôn được ghi với `status = draft` và `is_manual = false`. Provider không nhận lifecycle status và không có quyền publish.
 - Việc tạo question, source links, choices/rubric và `question_generation_runs` nằm trong cùng transaction. Audit lưu provider response ID, model, prompt version và token usage, không lưu lại response thô.
-- Prompt coi source content là dữ liệu không tin cậy, không phải instruction; request đặt `store: false` và giới hạn tổng context nguồn.
+- Prompt coi source content là dữ liệu không tin cậy, không phải instruction và giới hạn tổng context nguồn.
 
 ## Question review workflow
 
@@ -65,6 +67,25 @@ erDiagram
 - Session persist current position và timestamps. Mỗi mutation kiểm tra user ownership, session state, current question và choice membership; unique `(session_question_id, attempt_number)` chặn double submit.
 - Chấm MCQ là deterministic server code. Result lấy score, duration và topic breakdown từ snapshot/answer rows, không gọi AI và không đọc lại nội dung question bank.
 - Retry câu sai tạo session độc lập mới và lưu `retryOfSessionId`; lịch sử cũ giữ nguyên append-only.
+
+## AI essay evaluation
+
+- Essay session snapshot prompt, topic, source metadata và rubric version. `answer_drafts` tách khỏi submitted `answers`, nên autosave không tạo attempt giả và reload không mất nội dung.
+- Mỗi submit insert answer attempt mới trước khi gọi AI. Provider failure chỉ đưa session về trạng thái `answering`; answer đã lưu có thể retry mà không nhập lại.
+- Retrieval embed question rồi cosine search source chunks `processed` có cùng topic, technology và embedding model. Top-k và similarity threshold lấy từ environment.
+- Vercel AI SDK gọi Gemini Structured Output qua provider abstraction. Prompt coi answer/source là untrusted data và chỉ được dùng rubric, reference cùng retrieved context.
+- Server clamp từng dimension và tự tính weighted score. Khi không có evidence, `incorrect_claims` bị xóa và evaluation phải biểu thị uncertainty.
+- `evaluations` append-only giữ model, prompt version, correlation/provider response IDs, source IDs, usage và feedback. `ai_calls` giữ metadata vận hành/estimated cost cho cả success/failure nhưng không lưu prompt, answer hoặc raw error.
+
+## Adaptive mock interview
+
+- Mock session dùng state graph server-side `setup → asking → answering/evaluating → follow_up|asking|summary`, cùng nhánh `abandoned`. Transition ngoài graph bị từ chối trước khi query database.
+- Mỗi session có optimistic `version`; mutation phải khớp ownership, current state và version. Unique answer constraint cộng version lock ngăn double-submit tạo hai turn.
+- `deadline_at`, `current_position` và state được persist nên refresh hoặc thiết bị khác có thể resume. State trung gian có recovery path không yêu cầu nhập lại answer.
+- Câu chính chỉ lấy từ question bank `published`, snapshot rubric/source và không lặp question ID. Rule ưu tiên topic coverage cùng level trước khi Gemini được phép chọn một follow-up có giới hạn.
+- Follow-up là `session_questions` có `parent_session_question_id`, `follow_up_number` và `question_id = null`; nó kế thừa rubric/source snapshot của câu gốc.
+- Answer được persist trước evaluation. Gemini failure fallback sang câu bank tiếp theo; model không có quyền đổi session state, deadline, score hay question count.
+- Final report chỉ aggregate latest persisted evaluation theo answer. Mọi strength/gap/incorrect claim giữ liên kết về turn và answer làm evidence.
 
 ## Markdown ingestion
 
@@ -90,7 +111,7 @@ erDiagram
 
 - Taxonomy classifier deterministic chuẩn hóa technology aliases, sau đó gắn một topic chính, các technology liên quan, level và content type cho mỗi chunk.
 - Classification fields nằm trực tiếp trên `source_chunks`; quan hệ nhiều-nhiều với technology nằm ở `source_chunk_technologies` để báo cáo không phụ thuộc JSON metadata.
-- Embedding dùng `text-embedding-3-small` với 1536 chiều. `embedding_model` và `embedded_at` cho phép chạy lại mà không gọi API cho vector còn hợp lệ.
+- Embedding dùng `gemini-embedding-2` với output 1536 chiều. Document dùng `title: … | text: …`, retrieval query dùng `task: question answering | query: …`. `embedding_model` và `embedded_at` buộc re-embed khi đổi model nhưng bỏ qua vector Gemini còn hợp lệ.
 - Exact duplicate dùng checksum và luôn chạy trước semantic comparison. Semantic duplicate chỉ so chunk thuộc hai source khác nhau bằng cosine similarity.
 - Duplicate candidate không làm mất dữ liệu. Bảng `source_duplicate_candidates` giữ similarity cùng trạng thái review `pending`, `confirmed` hoặc `dismissed`; pipeline upsert lần phát hiện mới nhưng không ghi đè quyết định của người review.
 

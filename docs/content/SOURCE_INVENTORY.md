@@ -66,7 +66,7 @@ Sau khi Markdown/PDF đã được import, chạy `pnpm source:normalize`. Pipel
 
 1. Chuẩn hóa alias technology về slug trong taxonomy, ví dụ `Node`, `NodeJS`, `Node.js` thành `nodejs`.
 2. Gắn topic/category, một hoặc nhiều technology, level và content type cho từng chunk.
-3. Chỉ gọi OpenAI Embeddings cho chunk chưa có vector hoặc được tạo bởi model khác.
+3. Chỉ gọi Gemini Embeddings cho chunk chưa có vector hoặc được tạo bởi model khác.
 4. So checksum giữa các source trước; các cặp khác checksum mới được so cosine similarity.
 5. Upsert kết quả vào `source_duplicate_candidates` với trạng thái `pending`; không xóa source hoặc chunk.
 

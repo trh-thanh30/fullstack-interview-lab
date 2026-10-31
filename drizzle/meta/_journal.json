@@ -43,6 +43,27 @@
       "when": 1793265415856,
       "tag": "0005_minor_human_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793407427092,
+      "tag": "0006_stale_william_stryker",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793407541406,
+      "tag": "0007_fine_lightspeed",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793430750888,
+      "tag": "0008_faulty_big_bertha",
+      "breakpoints": true
     }
   ]
 }

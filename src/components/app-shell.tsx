@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 rounded-full border border-foreground/10 bg-card px-3 py-1.5 text-xs font-bold lg:flex">
               <BookOpenCheck className="size-3.5 text-accent-strong" aria-hidden="true" />
-              MCQ MVP
+              Mock Interview
             </div>
             <Suspense fallback={<Skeleton className="h-10 w-36 rounded-full" />}>
               <UserMenu />

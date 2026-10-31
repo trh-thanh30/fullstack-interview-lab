@@ -45,7 +45,7 @@ Xây dựng một website cá nhân giúp:
 | Database | Neon PostgreSQL, pgvector |
 | Data access | Drizzle ORM, Drizzle Kit |
 | Authentication | Auth.js, Google hoặc GitHub OAuth, email allowlist |
-| AI | Vercel AI SDK, OpenAI Responses API |
+| AI | Vercel AI SDK, Google Gemini API |
 | Storage | Vercel Blob khi có upload tài liệu từ UI |
 | Test | Vitest, Testing Library, Playwright |
 | CI/CD | GitHub Actions, Vercel Preview/Production |
@@ -462,9 +462,9 @@ Có phiên luyện trắc nghiệm hoàn chỉnh, lưu kết quả và giải th
 
 ## Exit criteria
 
-- AI evaluation trả đúng schema và có fallback khi lỗi.
-- Feedback chỉ ra điểm đúng, thiếu và sai.
-- Có thể tái đánh giá một answer với prompt/model mới mà không ghi đè lịch sử.
+- [x] AI evaluation trả đúng schema và có fallback khi lỗi.
+- [x] Feedback chỉ ra điểm đúng, thiếu và sai.
+- [x] Có thể tái đánh giá một answer với prompt/model mới mà không ghi đè lịch sử.
 
 ### Card AI-001 — AI provider abstraction
 
@@ -476,17 +476,17 @@ Có phiên luyện trắc nghiệm hoàn chỉnh, lưu kết quả và giải th
 
 **Tasks:**
 
-- [ ] Tích hợp Vercel AI SDK với OpenAI provider.
-- [ ] Cấu hình model theo environment, không hard-code trong UI.
-- [ ] Thêm timeout, retry có giới hạn và error mapping.
-- [ ] Log model, latency, token usage, estimated cost và prompt version.
-- [ ] Redact secret và nội dung nhạy cảm khỏi error log.
+- [x] Tích hợp Vercel AI SDK với Gemini provider.
+- [x] Cấu hình model theo environment, không hard-code trong UI.
+- [x] Thêm timeout, retry có giới hạn và error mapping.
+- [x] Log model, latency, token usage, estimated cost và prompt version.
+- [x] Redact secret và nội dung nhạy cảm khỏi error log.
 
 **Acceptance criteria:**
 
-- [ ] Có thể thay model bằng environment/config.
-- [ ] Request lỗi không làm session bị mất.
-- [ ] Mọi AI call có correlation ID.
+- [x] Có thể thay model bằng environment/config.
+- [x] Request lỗi không làm session bị mất.
+- [x] Mọi AI call có correlation ID.
 
 ### Card AI-002 — Context retrieval
 
@@ -498,16 +498,16 @@ Có phiên luyện trắc nghiệm hoàn chỉnh, lưu kết quả và giải th
 
 **Tasks:**
 
-- [ ] Embed câu hỏi hoặc retrieval query.
-- [ ] Filter chunk theo technology, source status và version.
-- [ ] Lấy top-k chunks và loại kết quả dưới similarity threshold.
-- [ ] Gắn source IDs vào evaluation input/output.
+- [x] Embed câu hỏi hoặc retrieval query.
+- [x] Filter chunk theo technology, source status và version.
+- [x] Lấy top-k chunks và loại kết quả dưới similarity threshold.
+- [x] Gắn source IDs vào evaluation input/output.
 
 **Acceptance criteria:**
 
-- [ ] Câu React không retrieve tài liệu Docker nếu không liên quan.
-- [ ] Khi không đủ context, evaluator phải biểu thị uncertainty.
-- [ ] Có test dataset nhỏ để kiểm tra retrieval regression.
+- [x] Câu React không retrieve tài liệu Docker nếu không liên quan.
+- [x] Khi không đủ context, evaluator phải biểu thị uncertainty.
+- [x] Có test dataset nhỏ để kiểm tra retrieval regression.
 
 ### Card AI-003 — Rubric-based evaluator
 
@@ -519,17 +519,17 @@ Có phiên luyện trắc nghiệm hoàn chỉnh, lưu kết quả và giải th
 
 **Tasks:**
 
-- [ ] Định nghĩa schema: score, dimensions, strengths, missingPoints, incorrectClaims, suggestedAnswer.
-- [ ] Chấm correctness, completeness, clarity và practical experience.
-- [ ] Prompt evaluator chỉ sử dụng rubric và context được cung cấp.
-- [ ] Validate và clamp score ở server.
-- [ ] Lưu evaluation mới theo kiểu append-only.
+- [x] Định nghĩa schema: score, dimensions, strengths, missingPoints, incorrectClaims, suggestedAnswer.
+- [x] Chấm correctness, completeness, clarity và practical experience.
+- [x] Prompt evaluator chỉ sử dụng rubric và context được cung cấp.
+- [x] Validate và clamp score ở server.
+- [x] Lưu evaluation mới theo kiểu append-only.
 
 **Acceptance criteria:**
 
-- [ ] Cùng một rubric luôn sinh đủ dimension bắt buộc.
-- [ ] Không có evidence thì không khẳng định một statement là sai chắc chắn.
-- [ ] UI phân biệt rõ feedback AI với đáp án/reference đã kiểm duyệt.
+- [x] Cùng một rubric luôn sinh đủ dimension bắt buộc.
+- [x] Không có evidence thì không khẳng định một statement là sai chắc chắn.
+- [x] UI phân biệt rõ feedback AI với đáp án/reference đã kiểm duyệt.
 
 ### Card AI-004 — Short-answer practice UI
 
@@ -541,16 +541,16 @@ Có phiên luyện trắc nghiệm hoàn chỉnh, lưu kết quả và giải th
 
 **Tasks:**
 
-- [ ] Tạo editor textarea có autosave.
-- [ ] Stream trạng thái đang đánh giá mà không stream JSON lỗi ra UI.
-- [ ] Hiển thị score breakdown và follow-up suggestion.
-- [ ] Cho phép retry answer và so sánh hai lần.
+- [x] Tạo editor textarea có autosave.
+- [x] Stream trạng thái đang đánh giá mà không stream JSON lỗi ra UI.
+- [x] Hiển thị score breakdown và follow-up suggestion.
+- [x] Cho phép retry answer và so sánh hai lần.
 
 **Acceptance criteria:**
 
-- [ ] Reload trước submit không mất bản nháp.
-- [ ] Submit nhiều lần tạo nhiều attempt, không ghi đè.
-- [ ] Lỗi AI cho phép retry mà không nhập lại câu trả lời.
+- [x] Reload trước submit không mất bản nháp.
+- [x] Submit nhiều lần tạo nhiều attempt, không ghi đè.
+- [x] Lỗi AI cho phép retry mà không nhập lại câu trả lời.
 
 ---
 
@@ -568,6 +568,8 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 ### Card MOCK-001 — Interview state machine
 
+**Status:** DONE
+
 **Priority:** P0  
 **Size:** M  
 **Dependencies:** AI-004
@@ -576,18 +578,20 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 **Tasks:**
 
-- [ ] Định nghĩa `setup`, `asking`, `answering`, `follow_up`, `evaluating`, `summary`, `abandoned`.
-- [ ] Định nghĩa transition hợp lệ ở domain layer.
-- [ ] Persist state và turn number sau mỗi bước.
-- [ ] Ngăn hai request song song chuyển cùng một session.
+- [x] Định nghĩa `setup`, `asking`, `answering`, `follow_up`, `evaluating`, `summary`, `abandoned`.
+- [x] Định nghĩa transition hợp lệ ở domain layer.
+- [x] Persist state và turn number sau mỗi bước.
+- [x] Ngăn hai request song song chuyển cùng một session.
 
 **Acceptance criteria:**
 
-- [ ] Transition không hợp lệ bị từ chối ở server.
-- [ ] Refresh ở mọi state đều phục hồi được.
-- [ ] Có unit test cho toàn bộ transition chính.
+- [x] Transition không hợp lệ bị từ chối ở server.
+- [x] Refresh ở mọi state đều phục hồi được.
+- [x] Có unit test cho toàn bộ transition chính.
 
 ### Card MOCK-002 — Adaptive question selection
+
+**Status:** DONE
 
 **Priority:** P0  
 **Size:** L  
@@ -597,19 +601,21 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 **Tasks:**
 
-- [ ] Chọn câu mở đầu từ question bank đã duyệt.
-- [ ] Dùng rule trước để đảm bảo coverage topic/level.
-- [ ] Cho AI chọn giữa follow-up hoặc chuyển câu mới bằng structured decision.
-- [ ] Giới hạn số follow-up trên mỗi câu.
-- [ ] Không lặp lại câu đã hỏi trong session.
+- [x] Chọn câu mở đầu từ question bank đã duyệt.
+- [x] Dùng rule trước để đảm bảo coverage topic/level.
+- [x] Cho AI chọn giữa follow-up hoặc chuyển câu mới bằng structured decision.
+- [x] Giới hạn số follow-up trên mỗi câu.
+- [x] Không lặp lại câu đã hỏi trong session.
 
 **Acceptance criteria:**
 
-- [ ] Session luôn tôn trọng số câu/thời lượng đã cấu hình.
-- [ ] Câu trả lời hời hợt có thể tạo follow-up phù hợp.
-- [ ] AI failure có deterministic fallback sang câu kế tiếp.
+- [x] Session luôn tôn trọng số câu/thời lượng đã cấu hình.
+- [x] Câu trả lời hời hợt có thể tạo follow-up phù hợp.
+- [x] AI failure có deterministic fallback sang câu kế tiếp.
 
 ### Card MOCK-003 — Interview room UI
+
+**Status:** DONE
 
 **Priority:** P0  
 **Size:** M  
@@ -619,18 +625,20 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 **Tasks:**
 
-- [ ] Hiển thị interviewer turn, answer composer, timer và progress.
-- [ ] Cho phép kết thúc sớm có xác nhận.
-- [ ] Không hiển thị score chi tiết giữa session theo mặc định.
-- [ ] Autosave câu trả lời và trạng thái kết nối.
+- [x] Hiển thị interviewer turn, answer composer, timer và progress.
+- [x] Cho phép kết thúc sớm có xác nhận.
+- [x] Không hiển thị score chi tiết giữa session theo mặc định.
+- [x] Autosave câu trả lời và trạng thái kết nối.
 
 **Acceptance criteria:**
 
-- [ ] Double-click submit không tạo hai turn.
-- [ ] Có thể resume session trên thiết bị khác sau khi đăng nhập.
-- [ ] UI vẫn dùng được khi AI response chậm.
+- [x] Double-click submit không tạo hai turn.
+- [x] Có thể resume session trên thiết bị khác sau khi đăng nhập.
+- [x] UI vẫn dùng được khi AI response chậm.
 
 ### Card MOCK-004 — Final interview report
+
+**Status:** DONE
 
 **Priority:** P0  
 **Size:** M  
@@ -640,15 +648,15 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 **Tasks:**
 
-- [ ] Tổng hợp score theo topic và dimension.
-- [ ] Liệt kê điểm mạnh, lỗ hổng và incorrect claims đáng chú ý.
-- [ ] Liên kết từng nhận xét với answer/evaluation tương ứng.
-- [ ] Đề xuất một practice set tiếp theo.
+- [x] Tổng hợp score theo topic và dimension.
+- [x] Liệt kê điểm mạnh, lỗ hổng và incorrect claims đáng chú ý.
+- [x] Liên kết từng nhận xét với answer/evaluation tương ứng.
+- [x] Đề xuất một practice set tiếp theo.
 
 **Acceptance criteria:**
 
-- [ ] Báo cáo không tạo score mới khác với evaluation từng câu mà không giải thích.
-- [ ] Có thể truy cập lại report từ history.
+- [x] Báo cáo không tạo score mới khác với evaluation từng câu mà không giải thích.
+- [x] Có thể truy cập lại report từ history.
 
 ---
 

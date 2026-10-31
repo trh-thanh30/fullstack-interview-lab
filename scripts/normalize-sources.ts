@@ -1,7 +1,7 @@
 import { loadEnvConfig } from "@next/env";
 
 import { DrizzleSourceNormalizationStore } from "../src/content/drizzle-source-normalization-store";
-import { OpenAIEmbeddingProvider } from "../src/content/embedding-provider";
+import { GeminiEmbeddingProvider } from "../src/content/embedding-provider";
 import { normalizeSourceContent } from "../src/content/source-normalization";
 import { seedTaxonomy } from "../src/db/seed";
 import { getRequiredEnv } from "../src/lib/env";
@@ -10,7 +10,7 @@ loadEnvConfig(process.cwd());
 
 const args = process.argv.slice(2);
 const semanticThreshold = readNumberOption(args, "--semantic-threshold", 0.92);
-const embeddingModel = readOption(args, "--embedding-model") ?? "text-embedding-3-small";
+const embeddingModel = readOption(args, "--embedding-model") ?? "gemini-embedding-2";
 const { getDatabase } = await import("../src/db/client");
 const database = getDatabase();
 
@@ -18,7 +18,10 @@ await seedTaxonomy(database);
 
 const result = await normalizeSourceContent({
   store: new DrizzleSourceNormalizationStore(database),
-  embedder: new OpenAIEmbeddingProvider(getRequiredEnv("OPENAI_API_KEY"), embeddingModel),
+  embedder: new GeminiEmbeddingProvider(
+    getRequiredEnv("GOOGLE_GENERATIVE_AI_API_KEY"),
+    embeddingModel,
+  ),
   semanticThreshold,
 });
 

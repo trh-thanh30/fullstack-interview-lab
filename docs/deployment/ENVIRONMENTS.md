@@ -20,7 +20,13 @@
 | `AUTH_GITHUB_SECRET` | GitHub OAuth app local | Credential hỗ trợ Preview | GitHub OAuth app production |
 | `AUTH_REDIRECT_PROXY_URL` | Để trống | Auth proxy URL ổn định nếu dùng OAuth trên URL động | Để trống |
 | `ALLOWED_EMAILS` | Email phát triển | Allowlist Preview | Allowlist Production |
-| `OPENAI_API_KEY` | Để trống đến AI-001 | Key non-production | Key Production |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini key development | Key non-production | Key Production |
+| `GEMINI_QUESTION_MODEL` | `gemini-2.5-flash` | Cùng model đã test | Model đã duyệt |
+| `GEMINI_EVALUATION_MODEL` | `gemini-2.5-flash` | Model non-production | Model đã qua regression eval |
+| `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-2` | Khớp source embeddings Preview | Khớp source embeddings Production |
+| `AI_RETRIEVAL_TOP_K` | `5` | `5` | Giá trị đã eval |
+| `AI_RETRIEVAL_SIMILARITY_THRESHOLD` | `0.68` | `0.68` | Giá trị đã eval |
+| `AI_INPUT_COST_PER_1M` / `AI_OUTPUT_COST_PER_1M` | Rate hiện hành hoặc `0` | Rate hiện hành | Rate hiện hành |
 
 ## CI environment
 
@@ -37,6 +43,7 @@ Không thêm production secret vào GitHub Actions cho workflow CI. Nếu sau n�
 5. Dùng Neon branch/database riêng cho Preview; không tick Production cho credential Preview.
 6. Redeploy sau mỗi lần đổi environment variables.
 7. Trong Project Settings → Git, xác nhận repository vẫn connected và Preview deployment được bật.
+8. Chạy migration mới trước khi dùng essay practice và bảo đảm source chunks đã được normalize bằng đúng `GEMINI_EMBEDDING_MODEL`.
 
 Vercel Git integration sẽ tạo Preview deployment cho branch/PR ngoài production branch. Liên kết này cần quyền trên tài khoản GitHub/Vercel nên không thể hoàn tất chỉ bằng thay đổi source code.
 

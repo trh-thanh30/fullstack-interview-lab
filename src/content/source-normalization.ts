@@ -65,7 +65,7 @@ export async function normalizeSourceContent(options: {
 
   for (let offset = 0; offset < pendingEmbeddingChunks.length; offset += batchSize) {
     const batch = pendingEmbeddingChunks.slice(offset, offset + batchSize);
-    const vectors = await options.embedder.embed(batch.map(buildEmbeddingInput));
+    const vectors = await options.embedder.embed(batch.map(buildEmbeddingInput), "document");
     const embeddings = batch.map((chunk, index) => ({
       chunkId: chunk.id,
       embedding: vectors[index]!,

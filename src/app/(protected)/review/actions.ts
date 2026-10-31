@@ -14,7 +14,7 @@ import {
   type QuestionFormState,
 } from "@/questions/question-form";
 import { generateQuestionDraft } from "@/questions/question-generation";
-import { OpenAIQuestionGenerationProvider } from "@/questions/openai-question-generation-provider";
+import { GeminiQuestionGenerationProvider } from "@/questions/gemini-question-generation-provider";
 import { QuestionStore } from "@/questions/question-store";
 
 export async function createQuestionAction(
@@ -81,9 +81,9 @@ export async function generateQuestionAction(
 
   try {
     const repository = new QuestionStore(getDatabase());
-    const provider = new OpenAIQuestionGenerationProvider(
-      getRequiredEnv("OPENAI_API_KEY"),
-      getRequiredEnv("OPENAI_QUESTION_MODEL"),
+    const provider = new GeminiQuestionGenerationProvider(
+      getRequiredEnv("GOOGLE_GENERATIVE_AI_API_KEY"),
+      getRequiredEnv("GEMINI_QUESTION_MODEL"),
     );
     const result = await generateQuestionDraft({
       repository,

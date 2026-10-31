@@ -1,64 +1,67 @@
-export const DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small";
+import { createGoogle, type GoogleEmbeddingModelOptions } from "@ai-sdk/google";
+import { embedMany } from "ai";
+
+export const DEFAULT_EMBEDDING_MODEL = "gemini-embedding-2";
 export const EMBEDDING_DIMENSIONS = 1536;
+
+export type EmbeddingPurpose = "document" | "query";
 
 export interface EmbeddingProvider {
   readonly model: string;
-  embed(inputs: string[]): Promise<number[][]>;
+  embed(inputs: string[], purpose?: EmbeddingPurpose): Promise<number[][]>;
 }
 
-type EmbeddingResponse = {
-  data?: Array<{ embedding?: number[]; index?: number }>;
-  error?: { message?: string };
-};
+type EmbeddingRunner = (input: {
+  values: string[];
+  purpose: EmbeddingPurpose;
+}) => Promise<number[][]>;
 
-export class OpenAIEmbeddingProvider implements EmbeddingProvider {
+export class GeminiEmbeddingProvider implements EmbeddingProvider {
   readonly model: string;
+  private readonly provider: ReturnType<typeof createGoogle>;
 
   constructor(
-    private readonly apiKey: string,
+    apiKey: string,
     model = DEFAULT_EMBEDDING_MODEL,
-    private readonly request: typeof fetch = fetch,
+    private readonly runner?: EmbeddingRunner,
   ) {
     this.model = model;
+    this.provider = createGoogle({ apiKey });
   }
 
-  async embed(inputs: string[]) {
+  async embed(inputs: string[], purpose: EmbeddingPurpose = "document") {
     if (inputs.length === 0) return [];
-
-    const response = await this.request("https://api.openai.com/v1/embeddings", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: inputs,
-        model: this.model,
-        encoding_format: "float",
-        dimensions: EMBEDDING_DIMENSIONS,
-      }),
-    });
-    const payload = (await response.json()) as EmbeddingResponse;
-
-    if (!response.ok) {
-      throw new Error(`OpenAI embedding request failed (${response.status}): ${payload.error?.message ?? "Unknown error"}`);
-    }
-
-    const embeddings = [...(payload.data ?? [])]
-      .sort((left, right) => (left.index ?? 0) - (right.index ?? 0))
-      .map((item) => item.embedding);
+    const values = inputs.map((input) => formatGeminiEmbeddingInput(input, purpose));
+    const embeddings = this.runner
+      ? await this.runner({ values, purpose })
+      : (await embedMany({
+          model: this.provider.embedding(this.model),
+          values,
+          maxRetries: 1,
+          abortSignal: AbortSignal.timeout(45_000),
+          providerOptions: {
+            google: {
+              outputDimensionality: EMBEDDING_DIMENSIONS,
+            } satisfies GoogleEmbeddingModelOptions,
+          },
+        })).embeddings;
 
     if (
       embeddings.length !== inputs.length ||
-      embeddings.some((embedding) => embedding?.length !== EMBEDDING_DIMENSIONS)
+      embeddings.some((embedding) => embedding.length !== EMBEDDING_DIMENSIONS)
     ) {
       throw new Error(
-        `OpenAI returned an invalid embedding batch; expected ${inputs.length} vectors with ${EMBEDDING_DIMENSIONS} dimensions.`,
+        `Gemini returned an invalid embedding batch; expected ${inputs.length} vectors with ${EMBEDDING_DIMENSIONS} dimensions.`,
       );
     }
-
-    return embeddings as number[][];
+    return embeddings;
   }
+}
+
+export function formatGeminiEmbeddingInput(input: string, purpose: EmbeddingPurpose) {
+  return purpose === "query"
+    ? `task: question answering | query: ${input}`
+    : `title: none | text: ${input}`;
 }
 
 export function buildEmbeddingInput(input: {
@@ -68,7 +71,6 @@ export function buildEmbeddingInput(input: {
 }) {
   const value = [input.sourceTitle, input.heading, input.content].filter(Boolean).join("\n\n");
 
-  // A conservative character cap keeps a chunk below the embedding endpoint's
-  // per-input token limit even for code-heavy content.
+  // Keep enough room for the Gemini retrieval prefix and stay below its input limit.
   return value.slice(0, 24_000);
 }

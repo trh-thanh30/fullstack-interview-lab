@@ -1,5 +1,7 @@
-import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
+import { randomUUID } from "node:crypto";
+
+import { GeminiStructuredProvider } from "@/ai/gemini-provider";
+import { AiProviderError, type AiProvider } from "@/ai/provider";
 
 import {
   generatedQuestionOutputSchema,
@@ -7,53 +9,47 @@ import {
   type QuestionGenerationProvider,
 } from "./question-generation";
 
-export class OpenAIQuestionGenerationProvider implements QuestionGenerationProvider {
-  private readonly client: Pick<OpenAI, "responses">;
+export class GeminiQuestionGenerationProvider implements QuestionGenerationProvider {
+  private readonly provider: AiProvider;
 
   constructor(
     apiKey: string,
     private readonly model: string,
-    client?: Pick<OpenAI, "responses">,
+    provider?: AiProvider,
   ) {
-    this.client = client ?? new OpenAI({ apiKey, timeout: 60_000, maxRetries: 0 });
+    this.provider = provider ?? new GeminiStructuredProvider(apiKey, model);
   }
 
   async generate(input: Parameters<QuestionGenerationProvider["generate"]>[0]) {
-    let response;
-
     try {
-      response = await this.client.responses.parse({
-        model: this.model,
-        store: false,
-        max_output_tokens: 4_000,
+      const result = await this.provider.generateStructured({
+        correlationId: randomUUID(),
+        feature: "question-generation",
+        promptVersion: input.promptVersion,
         instructions: buildInstructions(input.type),
         input: buildSourceContext(input.sources),
-        text: {
-          format: zodTextFormat(generatedQuestionOutputSchema, "question_draft"),
-        },
-        metadata: { feature: "qb-002", prompt_version: input.promptVersion },
+        schemaName: "question_draft",
+        schema: generatedQuestionOutputSchema,
+        maxOutputTokens: 4_000,
       });
+
+      return {
+        output: result.output,
+        providerResponseId: result.providerResponseId ?? result.correlationId,
+        model: result.model || this.model,
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+      };
     } catch (error) {
-      if (error instanceof OpenAI.APIError) throw error;
-      throw new InvalidGeneratedQuestionError("AI output không thể parse theo question schema.");
+      if (
+        error instanceof AiProviderError &&
+        error.code !== "invalid_output" &&
+        error.code !== "refusal"
+      ) {
+        throw error;
+      }
+      throw new InvalidGeneratedQuestionError("Gemini output không thể parse theo question schema.");
     }
-
-    if (response.status !== "completed" || response.incomplete_details) {
-      throw new InvalidGeneratedQuestionError(
-        `AI response chưa hoàn tất: ${response.incomplete_details?.reason ?? response.status ?? "unknown"}.`,
-      );
-    }
-    if (!response.output_parsed) {
-      throw new InvalidGeneratedQuestionError("AI từ chối hoặc không trả về question draft.");
-    }
-
-    return {
-      output: response.output_parsed,
-      providerResponseId: response.id,
-      model: response.model,
-      inputTokens: response.usage?.input_tokens ?? 0,
-      outputTokens: response.usage?.output_tokens ?? 0,
-    };
   }
 }
 
@@ -86,3 +82,4 @@ function buildSourceContext(sources: Parameters<QuestionGenerationProvider["gene
 function escapeAttribute(value: string) {
   return value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 }
+

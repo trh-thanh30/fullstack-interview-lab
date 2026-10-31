@@ -8,16 +8,22 @@ Tạo trải nghiệm phỏng vấn nhiều lượt, AI biết hỏi sâu nhưng
 
 ## Cards
 
-- [ ] [MOCK-001 — Interview state machine](./MOCK-001.md)
-- [ ] [MOCK-002 — Adaptive question selection](./MOCK-002.md)
-- [ ] [MOCK-003 — Interview room UI](./MOCK-003.md)
-- [ ] [MOCK-004 — Final interview report](./MOCK-004.md)
+- [x] [MOCK-001 — Interview state machine](./MOCK-001.md)
+- [x] [MOCK-002 — Adaptive question selection](./MOCK-002.md)
+- [x] [MOCK-003 — Interview room UI](./MOCK-003.md)
+- [x] [MOCK-004 — Final interview report](./MOCK-004.md)
 
 ## Exit criteria
 
-- [ ] Một mock interview chạy được từ setup đến final summary.
-- [ ] AI không thể tự ý bỏ qua state hoặc ghi dữ liệu ngoài schema.
-- [ ] Session dở dang có thể resume.
+- [x] Một mock interview chạy được từ setup đến final summary.
+- [x] AI không thể tự ý bỏ qua state hoặc ghi dữ liệu ngoài schema.
+- [x] Session dở dang có thể resume.
+
+## Verification
+
+- State transition, adaptive fallback, report aggregation và optimistic locking đều có automated test.
+- Test layout, ESLint và TypeScript pass; 32 test files / 78 tests cùng production build đều pass.
+- Production routes gồm `/interview`, `/interview/session/[id]` và report history.
 
 ## Điều hướng
 

@@ -1,4 +1,5 @@
 import {
+  type AnyPgColumn,
   boolean,
   index,
   integer,
@@ -21,6 +22,7 @@ export type SessionConfig = {
   level?: (typeof questionLevelEnum.enumValues)[number];
   questionCount?: number;
   durationMinutes?: number;
+  maxFollowUpsPerQuestion?: number;
   strategy?: "random" | "weak_first";
   retryOfSessionId?: string;
 };
@@ -34,6 +36,11 @@ export type SessionSourceSnapshot = {
 
 export type EvaluationDimensions = Record<string, number>;
 
+export type EssayDraft = {
+  answerText: string;
+  savedAt: string;
+};
+
 export const interviewSessions = pgTable(
   "interview_sessions",
   {
@@ -45,7 +52,9 @@ export const interviewSessions = pgTable(
     state: sessionStateEnum("state").default("setup").notNull(),
     config: jsonb("config").$type<SessionConfig>().default({}).notNull(),
     currentPosition: integer("current_position").default(0).notNull(),
+    version: integer("version").default(1).notNull(),
     startedAt: timestamp("started_at", { mode: "date", withTimezone: true }),
+    deadlineAt: timestamp("deadline_at", { mode: "date", withTimezone: true }),
     completedAt: timestamp("completed_at", { mode: "date", withTimezone: true }),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
       .defaultNow()
@@ -68,6 +77,11 @@ export const sessionQuestions = pgTable(
       .notNull()
       .references(() => interviewSessions.id, { onDelete: "cascade" }),
     questionId: uuid("question_id").references(() => questions.id, { onDelete: "set null" }),
+    parentSessionQuestionId: uuid("parent_session_question_id").references(
+      (): AnyPgColumn => sessionQuestions.id,
+      { onDelete: "set null" },
+    ),
+    followUpNumber: integer("follow_up_number").default(0).notNull(),
     position: integer("position").notNull(),
     questionType: questionTypeEnum("question_type").notNull(),
     promptSnapshot: text("prompt_snapshot").notNull(),
@@ -92,6 +106,7 @@ export const sessionQuestions = pgTable(
   (table) => [
     uniqueIndex("session_questions_session_position_unique").on(table.sessionId, table.position),
     index("session_questions_question_id_idx").on(table.questionId),
+    index("session_questions_parent_id_idx").on(table.parentSessionQuestionId),
   ],
 );
 
@@ -118,6 +133,52 @@ export const answers = pgTable(
   ],
 );
 
+export const answerDrafts = pgTable(
+  "answer_drafts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionQuestionId: uuid("session_question_id")
+      .notNull()
+      .references(() => sessionQuestions.id, { onDelete: "cascade" }),
+    answerText: text("answer_text").default("").notNull(),
+    savedAt: timestamp("saved_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("answer_drafts_session_question_unique").on(table.sessionQuestionId),
+  ],
+);
+
+export const aiCalls = pgTable(
+  "ai_calls",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    correlationId: uuid("correlation_id").notNull(),
+    feature: text("feature").notNull(),
+    provider: text("provider").notNull(),
+    model: text("model").notNull(),
+    promptVersion: text("prompt_version").notNull(),
+    status: text("status").notNull(),
+    errorCode: text("error_code"),
+    latencyMs: integer("latency_ms").notNull(),
+    inputTokens: integer("input_tokens"),
+    outputTokens: integer("output_tokens"),
+    estimatedCostUsd: numeric("estimated_cost_usd", {
+      mode: "number",
+      precision: 10,
+      scale: 6,
+    }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("ai_calls_correlation_id_unique").on(table.correlationId),
+    index("ai_calls_feature_created_at_idx").on(table.feature, table.createdAt),
+  ],
+);
+
 export const evaluations = pgTable(
   "evaluations",
   {
@@ -130,12 +191,19 @@ export const evaluations = pgTable(
     promptVersion: text("prompt_version").notNull(),
     score: numeric("score", { mode: "number", precision: 5, scale: 2 }).notNull(),
     dimensions: jsonb("dimensions").$type<EvaluationDimensions>().default({}).notNull(),
+    dimensionFeedback: jsonb("dimension_feedback")
+      .$type<Record<string, string>>()
+      .default({})
+      .notNull(),
     strengths: jsonb("strengths").$type<string[]>().default([]).notNull(),
     missingPoints: jsonb("missing_points").$type<string[]>().default([]).notNull(),
     incorrectClaims: jsonb("incorrect_claims").$type<string[]>().default([]).notNull(),
+    uncertainty: text("uncertainty"),
     suggestedAnswer: text("suggested_answer"),
     followUpQuestion: text("follow_up_question"),
     sourceChunkIds: jsonb("source_chunk_ids").$type<string[]>().default([]).notNull(),
+    correlationId: uuid("correlation_id"),
+    providerResponseId: text("provider_response_id"),
     latencyMs: integer("latency_ms"),
     inputTokens: integer("input_tokens"),
     outputTokens: integer("output_tokens"),

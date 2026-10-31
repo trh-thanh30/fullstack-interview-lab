@@ -8,16 +8,22 @@
 
 ## Cards
 
-- [ ] [AI-001 — AI provider abstraction](./AI-001.md)
-- [ ] [AI-002 — Context retrieval](./AI-002.md)
-- [ ] [AI-003 — Rubric-based evaluator](./AI-003.md)
-- [ ] [AI-004 — Short-answer practice UI](./AI-004.md)
+- [x] [AI-001 — AI provider abstraction](./AI-001.md)
+- [x] [AI-002 — Context retrieval](./AI-002.md)
+- [x] [AI-003 — Rubric-based evaluator](./AI-003.md)
+- [x] [AI-004 — Short-answer practice UI](./AI-004.md)
 
 ## Exit criteria
 
-- [ ] AI evaluation trả đúng schema và có fallback khi lỗi.
-- [ ] Feedback chỉ ra điểm đúng, thiếu và sai.
-- [ ] Có thể tái đánh giá một answer với prompt/model mới mà không ghi đè lịch sử.
+- [x] AI evaluation trả đúng schema và có fallback khi lỗi.
+- [x] Feedback chỉ ra điểm đúng, thiếu và sai.
+- [x] Có thể tái đánh giá một answer với prompt/model mới mà không ghi đè lịch sử.
+
+## Verification
+
+- Test layout, ESLint và TypeScript đều pass.
+- 28 test files / 68 tests pass, gồm PGlite migration + essay persistence, Gemini embedding contract, retrieval regression và server weighted scoring.
+- Production build tạo thành công `/essay` và `/essay/session/[id]` với Cache Components.
 
 ## Điều hướng
 

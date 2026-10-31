@@ -2,36 +2,33 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   EMBEDDING_DIMENSIONS,
-  OpenAIEmbeddingProvider,
+  GeminiEmbeddingProvider,
   buildEmbeddingInput,
+  formatGeminiEmbeddingInput,
 } from "../embedding-provider";
 
-describe("OpenAIEmbeddingProvider", () => {
-  it("requests ordered 1536-dimensional float embeddings", async () => {
+describe("GeminiEmbeddingProvider", () => {
+  it("formats document batches and requires 1536-dimensional vectors", async () => {
     const vector = Array.from({ length: EMBEDDING_DIMENSIONS }, () => 0.25);
-    const request = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          data: [
-            { index: 1, embedding: vector },
-            { index: 0, embedding: vector.map(() => 0.5) },
-          ],
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
-    );
-    const provider = new OpenAIEmbeddingProvider("test-key", "text-embedding-3-small", request);
+    const runner = vi.fn().mockResolvedValue([
+      vector.map(() => 0.5),
+      vector,
+    ]);
+    const provider = new GeminiEmbeddingProvider("test-key", "gemini-embedding-2", runner);
 
-    const embeddings = await provider.embed(["first", "second"]);
+    const embeddings = await provider.embed(["first", "second"], "document");
 
     expect(embeddings[0]?.[0]).toBe(0.5);
     expect(embeddings[1]?.[0]).toBe(0.25);
-    expect(request).toHaveBeenCalledWith(
-      "https://api.openai.com/v1/embeddings",
-      expect.objectContaining({
-        method: "POST",
-        body: expect.stringContaining(`"dimensions":${EMBEDDING_DIMENSIONS}`),
-      }),
+    expect(runner).toHaveBeenCalledWith({
+      values: ["title: none | text: first", "title: none | text: second"],
+      purpose: "document",
+    });
+  });
+
+  it("uses the Gemini question-answering prefix for retrieval queries", () => {
+    expect(formatGeminiEmbeddingInput("React effect cleanup", "query")).toBe(
+      "task: question answering | query: React effect cleanup",
     );
   });
 

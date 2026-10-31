@@ -119,7 +119,7 @@ pnpm source:normalize
 pnpm source:normalize -- --semantic-threshold 0.94
 ```
 
-Lệnh cần `DATABASE_URL` và `OPENAI_API_KEY`. Pipeline dùng exact checksum trước semantic similarity, in báo cáo theo category/technology và không tự xóa chunk. Embedding hiện dùng `text-embedding-3-small` với 1536 chiều; chunk đã có embedding đúng model sẽ được bỏ qua khi chạy lại.
+Lệnh cần `DATABASE_URL` và `GOOGLE_GENERATIVE_AI_API_KEY`. Pipeline dùng exact checksum trước semantic similarity, in báo cáo theo category/technology và không tự xóa chunk. Embedding dùng `gemini-embedding-2` với output 1536 chiều; query/document dùng retrieval prefix riêng. Chunk có embedding từ model cũ sẽ tự được re-embed khi chạy lại.
 
 ## UI foundation
 
@@ -131,13 +131,25 @@ Domain model và các quyết định persistence nằm tại [DOMAIN_MODEL.md](
 
 Sau khi đăng nhập, mở `/review` để lọc, tạo, sửa, preview, publish hoặc archive câu hỏi. Mở `/review/generate` để tạo AI draft từ 1–5 source chunks đã xử lý và `/review/queue` để duyệt liên tục bằng keyboard. Published MCQ bắt buộc có đáp án đúng; câu tự luận bắt buộc có rubric; mọi câu published phải liên kết source chunk hoặc được đánh dấu manual.
 
-AI generation cần `OPENAI_API_KEY` và `OPENAI_QUESTION_MODEL`. Generated question luôn là draft để người dùng review trước khi publish.
+AI generation cần `GOOGLE_GENERATIVE_AI_API_KEY` và `GEMINI_QUESTION_MODEL`. Generated question luôn là draft để người dùng review trước khi publish.
 
 ## MCQ practice
 
 Mở `/practice` để lọc question `published`, bắt đầu một session có snapshot, resume sau refresh và xem debrief theo topic. Keyboard hỗ trợ chọn bằng `1–6`/`A–F`, submit bằng `Enter` và chuyển câu bằng `Enter` hoặc `N`. Result cũ mở lại được từ session history; câu sai có thể tạo thành một session retry riêng.
 
+## AI essay practice
+
+Mở `/essay` để chọn short-answer question đã publish. Workspace `/essay/session/[id]` autosave draft, tạo answer attempt append-only, retrieve source context theo topic/technology và chấm bốn dimension theo rubric snapshot. Lỗi AI không làm mất answer; từng attempt có thể đánh giá lại bằng model/prompt mới và giữ toàn bộ evaluation history.
+
+AI evaluation cần `GOOGLE_GENERATIVE_AI_API_KEY`, `GEMINI_EVALUATION_MODEL` và source embeddings cùng `GEMINI_EMBEDDING_MODEL`. Top-k/threshold retrieval và token cost rates được cấu hình qua các biến `AI_*` trong `.env.example`.
+
+## Adaptive mock interview
+
+Mở `/interview` để cấu hình topic, technology, level, số câu, thời lượng và giới hạn follow-up. Session snapshot câu hỏi đã publish, autosave answer, resume theo tài khoản và dùng optimistic version để chặn double-submit. Gemini chỉ quyết định follow-up hay chuyển câu trong giới hạn của state machine; khi AI lỗi, engine chuyển sang câu bank tiếp theo theo rule deterministic.
+
+Final report tổng hợp score đã lưu theo topic/dimension, liên kết feedback về từng answer và đề xuất practice set từ các vùng điểm yếu. Report không gọi AI để tạo một score mới.
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Card vừa hoàn thành: MCQ-004](./docs/roadmap/phase-3-quiz-mvp/MCQ-004.md)
+- [Phase vừa hoàn thành: Mock interview thích ứng](./docs/roadmap/phase-5-mock-interview/README.md)
