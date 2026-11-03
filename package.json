@@ -29,10 +29,13 @@
   "dependencies": {
     "@ai-sdk/google": "4.0.109",
     "@base-ui/react": "^1.9.0",
+    "@codemirror/lang-javascript": "^6.2.5",
     "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@neondatabase/serverless": "^1.2.0",
     "@next/env": "^16.4.3",
+    "@uiw/react-codemirror": "^4.25.12",
+    "@vercel/blob": "^2.4.1",
     "ai": "7.0.159",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.0",

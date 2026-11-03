@@ -8,7 +8,7 @@ import { vector } from "@electric-sql/pglite-pgvector";
 import { drizzle } from "drizzle-orm/pglite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { seedTaxonomy } from "../seed";
+import { seedSystemDesignProblems, seedTaxonomy } from "../seed";
 
 describe("initial database migration", () => {
   let client: PGlite;
@@ -65,6 +65,12 @@ describe("initial database migration", () => {
         "session_questions",
         "answers",
         "evaluations",
+        "system_design_problems",
+        "system_design_checkpoint_responses",
+        "system_design_reviews",
+        "design_attachments",
+        "coding_drafts",
+        "coding_reviews",
       ]),
     );
 
@@ -129,5 +135,13 @@ describe("initial database migration", () => {
 
     expect(columns.rows[0]?.column_name).toBe("is_manual");
     expect(columns.rows[0]?.column_default).toContain("false");
+  });
+
+  it("seeds three reviewed system-design templates idempotently", async () => {
+    const database = drizzle({ client });
+    await seedSystemDesignProblems(database);
+    await seedSystemDesignProblems(database);
+    const result = await client.query<{ count: number }>("SELECT count(*)::int AS count FROM system_design_problems WHERE reviewed_at IS NOT NULL");
+    expect(result.rows[0]?.count).toBe(3);
   });
 });

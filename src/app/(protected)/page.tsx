@@ -76,22 +76,22 @@ export default function DashboardPage() {
                 <p className="text-[11px] font-extrabold tracking-[0.18em] text-muted-foreground uppercase">
                   Tiếp theo
                 </p>
-                <h2 className="mt-2 text-xl font-extrabold">Mock interview thích ứng</h2>
+                <h2 className="mt-2 text-xl font-extrabold">System design & coding</h2>
               </div>
               <span className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-extrabold text-accent-ink">
-                Phase 5
+                Phase 6
               </span>
             </div>
             <div className="mt-8 h-2 overflow-hidden rounded-full bg-ink/8">
               <div className="h-full w-full rounded-full bg-accent-strong" />
             </div>
             <div className="mt-3 flex justify-between text-xs font-bold text-muted-foreground">
-              <span>Mock interview</span>
-              <span>4 / 4 cards</span>
+              <span>Open-ended practice</span>
+              <span>3 / 3 cards</span>
             </div>
             <div className="mt-7 flex items-center gap-3 border-t border-ink/10 pt-5 text-sm font-bold">
               <CircleDot className="size-4 text-accent-ink" aria-hidden="true" />
-              Interview room đã sẵn sàng
+              Architecture & code studio đã sẵn sàng
             </div>
           </div>
         </div>

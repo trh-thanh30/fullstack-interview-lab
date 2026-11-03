@@ -149,7 +149,15 @@ Mở `/interview` để cấu hình topic, technology, level, số câu, thời 
 
 Final report tổng hợp score đã lưu theo topic/dimension, liên kết feedback về từng answer và đề xuất practice set từ các vùng điểm yếu. Report không gọi AI để tạo một score mới.
 
+## System-design studio
+
+Mở `/design` để chọn một trong ba problem template đã review và đi qua sáu checkpoint: clarify, estimate, high-level design, deep dive, trade-offs và summary. Markdown notes tự lưu; Mermaid lưu dạng text; diagram ảnh nằm trong private Vercel Blob và chỉ được đọc qua route có kiểm tra ownership.
+
+## Coding workspace
+
+Mở `/coding` để chọn coding question đã publish, viết JavaScript/TypeScript bằng CodeMirror và lưu language, code cùng explanation. Workspace không chạy code trong Vercel Function. Gemini chỉ static review complexity, correctness assumptions và edge cases; mọi review persist `execution_status = not_run` và hiển thị rõ code chưa được thực thi.
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Phase vừa hoàn thành: Mock interview thích ứng](./docs/roadmap/phase-5-mock-interview/README.md)
+- [Phase vừa hoàn thành: System design và coding](./docs/roadmap/phase-6-system-design-coding/README.md)

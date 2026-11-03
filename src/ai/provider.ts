@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { z } from 'zod';
 
 export type AiUsage = {
   inputTokens: number;
@@ -23,30 +23,32 @@ export type StructuredGenerationInput<T> = {
   schemaName: string;
   schema: z.ZodType<T>;
   maxOutputTokens?: number;
+  images?: Array<{ data: Uint8Array; mediaType: 'image/png' | 'image/jpeg' | 'image/webp' }>;
 };
 
 export interface AiProvider {
   readonly name: string;
   readonly model: string;
-  generateStructured<T>(input: StructuredGenerationInput<T>): Promise<StructuredGenerationResult<T>>;
+  generateStructured<T>(
+    input: StructuredGenerationInput<T>
+  ): Promise<StructuredGenerationResult<T>>;
 }
 
 export type AiErrorCode =
-  | "auth"
-  | "rate_limit"
-  | "timeout"
-  | "refusal"
-  | "invalid_output"
-  | "provider_unavailable";
+  | 'auth'
+  | 'rate_limit'
+  | 'timeout'
+  | 'refusal'
+  | 'invalid_output'
+  | 'provider_unavailable';
 
 export class AiProviderError extends Error {
   constructor(
     readonly code: AiErrorCode,
     message: string,
-    options?: { cause?: unknown },
+    options?: { cause?: unknown }
   ) {
     super(message, options);
-    this.name = "AiProviderError";
+    this.name = 'AiProviderError';
   }
 }
-

@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   experimental: {
     useTypeScriptCli: false,
+    serverActions: {
+      bodySizeLimit: "4mb",
+    },
   },
   partialPrefetching: true,
 };

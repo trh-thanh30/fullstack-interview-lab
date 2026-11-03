@@ -87,6 +87,15 @@ erDiagram
 - Answer được persist trước evaluation. Gemini failure fallback sang câu bank tiếp theo; model không có quyền đổi session state, deadline, score hay question count.
 - Final report chỉ aggregate latest persisted evaluation theo answer. Mọi strength/gap/incorrect claim giữ liên kết về turn và answer làm evidence.
 
+## System-design và coding workspaces
+
+- `system_design_problems` giữ context, functional/non-functional requirements, constraints và rubric bảy chiều. Seed tạo idempotent ba bài mẫu đã review.
+- Session đi qua sáu checkpoint cố định. `system_design_checkpoint_responses` autosave Markdown; `system_design_reviews` append-only giữ feedback assumption/trade-off và score server-weighted.
+- Mermaid nằm trong `design_attachments`; ảnh chỉ nhận PNG/JPEG/WebP tối đa 3 MB, lưu private Vercel Blob và metadata/ownership nằm trong PostgreSQL.
+- Private image chỉ được stream qua authenticated route hoặc tải server-side thành bytes cho Gemini multimodal input. Xóa image gọi Blob `del` trước khi xóa metadata.
+- Coding session snapshot published coding question/rubric. `coding_drafts` giữ language, code, explanation; `coding_reviews` giữ đúng source snapshot đã review.
+- Web tier không có code runner. Mọi coding review có `execution_status = not_run`; prompt và UI cấm tuyên bố test pass hoặc code chạy đúng khi không có execution evidence.
+
 ## Markdown ingestion
 
 - Markdown importer chỉ đọc directory nằm trong allowlist, canonicalize file path và đăng ký SHA-256 trước khi parse.

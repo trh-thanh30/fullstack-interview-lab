@@ -45,3 +45,33 @@ export const technologySeed = [
   { slug: "design-patterns", name: "Design Patterns", topicSlug: "architecture" },
   { slug: "clean-architecture", name: "Clean Architecture", topicSlug: "architecture" },
 ] as const;
+
+export const systemDesignProblemSeed = [
+  {
+    slug: "url-shortener",
+    title: "Thiết kế dịch vụ rút gọn URL toàn cầu",
+    level: "middle",
+    context: "Thiết kế dịch vụ tạo short link và redirect người dùng với độ trễ thấp trên nhiều khu vực.",
+    functionalRequirements: ["Tạo short URL", "Redirect sang URL gốc", "Thống kê click cơ bản"],
+    nonFunctionalRequirements: ["99,99% availability cho redirect", "P99 dưới 100 ms", "Link tồn tại tối thiểu 5 năm"],
+    constraints: ["100 triệu URL mới mỗi tháng", "Read/write xấp xỉ 100:1", "Analytics có thể eventual consistent"],
+  },
+  {
+    slug: "notification-platform",
+    title: "Thiết kế nền tảng notification đa kênh",
+    level: "senior",
+    context: "Thiết kế platform nhận event và gửi email, push notification hoặc SMS theo preference người dùng.",
+    functionalRequirements: ["Nhận request idempotent", "Áp template và preference", "Theo dõi delivery và retry"],
+    nonFunctionalRequirements: ["Không gửi trùng", "Chịu burst 1 triệu event/phút", "Provider failure không làm mất message"],
+    constraints: ["Nhiều provider bên thứ ba", "Rate limit khác nhau theo kênh", "Chi phí SMS phải kiểm soát"],
+  },
+  {
+    slug: "collaborative-interview-platform",
+    title: "Thiết kế nền tảng phỏng vấn cộng tác",
+    level: "senior",
+    context: "Thiết kế phòng phỏng vấn cho interviewer và candidate cùng chỉnh code và lưu feedback theo thời gian thực.",
+    functionalRequirements: ["Tạo và tham gia room", "Đồng bộ editor gần real-time", "Lưu transcript, rubric và decision"],
+    nonFunctionalRequirements: ["Reconnect không mất draft", "Phân quyền rõ ràng", "Audit trail append-only"],
+    constraints: ["Tối đa 10 người/phòng", "Không chạy untrusted code ở web tier", "Dữ liệu interview là private"],
+  },
+] as const;

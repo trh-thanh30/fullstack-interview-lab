@@ -1,11 +1,11 @@
 import { loadEnvConfig } from "@next/env";
 
-import { seedTaxonomy } from "../src/db/seed";
+import { seedAll } from "../src/db/seed";
 
 loadEnvConfig(process.cwd());
 
 const { getDatabase } = await import("../src/db/client");
 
-await seedTaxonomy(getDatabase());
+await seedAll(getDatabase());
 
-console.info("Taxonomy seed completed successfully.");
+console.info("Taxonomy and reviewed system-design templates seeded successfully.");

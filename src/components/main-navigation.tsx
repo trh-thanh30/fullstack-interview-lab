@@ -1,6 +1,6 @@
 "use client";
 
-import { BrainCircuit, ClipboardCheck, LayoutDashboard, MessagesSquare, Wrench } from "lucide-react";
+import { BrainCircuit, Braces, ClipboardCheck, DraftingCompass, LayoutDashboard, MessagesSquare, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +11,8 @@ const navigation = [
   { href: "/practice", label: "Practice", icon: ClipboardCheck },
   { href: "/essay", label: "Essay", icon: BrainCircuit },
   { href: "/interview", label: "Interview", icon: MessagesSquare },
+  { href: "/design", label: "Design", icon: DraftingCompass },
+  { href: "/coding", label: "Coding", icon: Braces },
   { href: "/review", label: "Review", icon: Wrench },
 ] as const;
 

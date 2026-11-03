@@ -23,6 +23,7 @@ export type SessionConfig = {
   questionCount?: number;
   durationMinutes?: number;
   maxFollowUpsPerQuestion?: number;
+  templateId?: string;
   strategy?: "random" | "weak_first";
   retryOfSessionId?: string;
 };

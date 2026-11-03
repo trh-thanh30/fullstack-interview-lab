@@ -11,6 +11,7 @@ export const editableQuestionTypeValues = [
   "short_answer",
   "deep_dive",
   "system_design",
+  "coding",
 ] as const;
 
 const nonEmptyLines = z

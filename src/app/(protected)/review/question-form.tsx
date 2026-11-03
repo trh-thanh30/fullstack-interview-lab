@@ -102,6 +102,7 @@ export function QuestionForm({
                   <option value="short_answer">Short answer</option>
                   <option value="deep_dive">Deep dive</option>
                   <option value="system_design">System design</option>
+                  <option value="coding">Coding</option>
                 </select>
               </Field>
               <Field label="Level" error={state.fieldErrors?.level?.[0]}>

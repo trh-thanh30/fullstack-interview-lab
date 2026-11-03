@@ -64,6 +64,13 @@
       "when": 1793430750888,
       "tag": "0008_faulty_big_bertha",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793433971403,
+      "tag": "0009_flaky_jubilee",
+      "breakpoints": true
     }
   ]
 }

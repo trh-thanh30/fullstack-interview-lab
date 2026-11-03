@@ -673,6 +673,8 @@ Mở rộng từ Q&A sang bài phỏng vấn mở, tập trung vào cách làm r
 
 ### Card SYS-001 — System design interview template
 
+**Status:** DONE
+
 **Priority:** P1  
 **Size:** L  
 **Dependencies:** MOCK-004
@@ -681,18 +683,20 @@ Mở rộng từ Q&A sang bài phỏng vấn mở, tập trung vào cách làm r
 
 **Tasks:**
 
-- [ ] Tạo problem template: context, functional requirements, non-functional requirements và constraints.
-- [ ] Chia session thành clarify, estimate, high-level design, deep dive, trade-offs và summary.
-- [ ] Tạo rubric cho từng checkpoint.
-- [ ] Cho phép ghi chú kiến trúc dạng Markdown.
+- [x] Tạo problem template: context, functional requirements, non-functional requirements và constraints.
+- [x] Chia session thành clarify, estimate, high-level design, deep dive, trade-offs và summary.
+- [x] Tạo rubric cho từng checkpoint.
+- [x] Cho phép ghi chú kiến trúc dạng Markdown.
 
 **Acceptance criteria:**
 
-- [ ] Người dùng không bị ép theo một đáp án kiến trúc duy nhất.
-- [ ] Feedback đánh giá trade-off và assumption, không chỉ tên công nghệ.
-- [ ] Có ít nhất ba bài mẫu đã review.
+- [x] Người dùng không bị ép theo một đáp án kiến trúc duy nhất.
+- [x] Feedback đánh giá trade-off và assumption, không chỉ tên công nghệ.
+- [x] Có ít nhất ba bài mẫu đã review.
 
 ### Card SYS-002 — Diagram attachment
+
+**Status:** DONE
 
 **Priority:** P2  
 **Size:** M  
@@ -702,16 +706,18 @@ Mở rộng từ Q&A sang bài phỏng vấn mở, tập trung vào cách làm r
 
 **Tasks:**
 
-- [ ] Cho phép upload ảnh hoặc lưu Mermaid text.
-- [ ] Lưu file ở Vercel Blob và metadata trong PostgreSQL.
-- [ ] Cho phép AI nhận image input khi model hỗ trợ.
+- [x] Cho phép upload ảnh hoặc lưu Mermaid text.
+- [x] Lưu file ở Vercel Blob và metadata trong PostgreSQL.
+- [x] Cho phép AI nhận image input khi model hỗ trợ.
 
 **Acceptance criteria:**
 
-- [ ] Chỉ chấp nhận MIME type và kích thước được cho phép.
-- [ ] Xóa attachment khỏi session không để lại link công khai ngoài ý muốn.
+- [x] Chỉ chấp nhận MIME type và kích thước được cho phép.
+- [x] Xóa attachment khỏi session không để lại link công khai ngoài ý muốn.
 
 ### Card CODE-001 — Coding question workspace
+
+**Status:** DONE
 
 **Priority:** P2  
 **Size:** L  
@@ -721,15 +727,15 @@ Mở rộng từ Q&A sang bài phỏng vấn mở, tập trung vào cách làm r
 
 **Tasks:**
 
-- [ ] Tích hợp code editor có syntax highlighting.
-- [ ] Lưu language, code và explanation.
-- [ ] Cho AI review complexity, correctness assumptions và edge cases.
-- [ ] Không thực thi code trong Vercel Function.
+- [x] Tích hợp code editor có syntax highlighting.
+- [x] Lưu language, code và explanation.
+- [x] Cho AI review complexity, correctness assumptions và edge cases.
+- [x] Không thực thi code trong Vercel Function.
 
 **Acceptance criteria:**
 
-- [ ] Code draft được autosave.
-- [ ] AI feedback ghi rõ code chưa được chạy nếu không có execution result.
+- [x] Code draft được autosave.
+- [x] AI feedback ghi rõ code chưa được chạy nếu không có execution result.
 
 ---
 

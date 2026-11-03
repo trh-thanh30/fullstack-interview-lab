@@ -27,6 +27,7 @@
 | `AI_RETRIEVAL_TOP_K` | `5` | `5` | Giá trị đã eval |
 | `AI_RETRIEVAL_SIMILARITY_THRESHOLD` | `0.68` | `0.68` | Giá trị đã eval |
 | `AI_INPUT_COST_PER_1M` / `AI_OUTPUT_COST_PER_1M` | Rate hiện hành hoặc `0` | Rate hiện hành | Rate hiện hành |
+| `BLOB_READ_WRITE_TOKEN` | Private Blob development store | Private Blob Preview store | Private Blob Production store |
 
 ## CI environment
 
@@ -44,6 +45,7 @@ Không thêm production secret vào GitHub Actions cho workflow CI. Nếu sau n�
 6. Redeploy sau mỗi lần đổi environment variables.
 7. Trong Project Settings → Git, xác nhận repository vẫn connected và Preview deployment được bật.
 8. Chạy migration mới trước khi dùng essay practice và bảo đảm source chunks đã được normalize bằng đúng `GEMINI_EMBEDDING_MODEL`.
+9. Tạo Vercel Blob store với access `Private`; không dùng public store cho diagram của interview session.
 
 Vercel Git integration sẽ tạo Preview deployment cho branch/PR ngoài production branch. Liên kết này cần quyền trên tài khoản GitHub/Vercel nên không thể hoàn tất chỉ bằng thay đổi source code.
 

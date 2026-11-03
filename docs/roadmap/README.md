@@ -28,7 +28,7 @@
 | [Phase 3](./phase-3-quiz-mvp/README.md) | Trắc nghiệm MVP | 4 | DONE |
 | [Phase 4](./phase-4-ai-essay/README.md) | Tự luận có AI đánh giá | 4 | DONE |
 | [Phase 5](./phase-5-mock-interview/README.md) | Mock interview thích ứng | 4 | DONE |
-| [Phase 6](./phase-6-system-design-coding/README.md) | System design và coding | 3 | TODO |
+| [Phase 6](./phase-6-system-design-coding/README.md) | System design và coding | 3 | DONE |
 | [Phase 7](./phase-7-learning-loop/README.md) | Learning loop | 3 | TODO |
 | [Phase 8](./phase-8-production/README.md) | Production hardening | 4 | TODO |
 
