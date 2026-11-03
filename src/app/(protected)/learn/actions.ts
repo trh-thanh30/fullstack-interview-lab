@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getDatabase } from "@/db/client";
+import { publicAiError } from "@/ai/public-error";
 import { LearningStore } from "@/learning/learning-store";
 import { narrateLearningPlan } from "@/learning/plan-narrator";
 import { requireAuthenticatedUser } from "@/lib/auth/dal";
@@ -75,7 +76,7 @@ export async function narrateLearningPlanAction(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Không thể tạo lời giải thích lúc này.",
+      message: publicAiError(error, error instanceof Error ? error.message : "Không thể tạo lời giải thích lúc này."),
       actions: [],
     };
   }

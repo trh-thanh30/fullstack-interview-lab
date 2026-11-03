@@ -84,7 +84,7 @@ export async function evaluateEssay(options: {
   } catch (error) {
     const mapped = error instanceof AiProviderError
       ? error
-      : new AiProviderError("provider_unavailable", "Không thể hoàn tất đánh giá AI.", { cause: error });
+      : new AiProviderError("provider_unavailable", "Không thể hoàn tất đánh giá AI.", { cause: error, correlationId });
     await options.logger.write({
       correlationId,
       feature: "essay-evaluation",
@@ -95,7 +95,9 @@ export async function evaluateEssay(options: {
       errorCode: mapped.code,
       latencyMs: Math.round(performance.now() - startedAt),
     });
-    throw mapped;
+    throw mapped.correlationId
+      ? mapped
+      : new AiProviderError(mapped.code, mapped.message, { cause: mapped, correlationId });
   }
 }
 

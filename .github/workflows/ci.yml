@@ -61,6 +61,12 @@ jobs:
       - name: Check test layout
         run: pnpm check:test-layout
 
+      - name: Scan committed files for secrets
+        run: pnpm security:secrets
+
+      - name: Check AI evaluation baselines
+        run: pnpm ai:eval:check
+
       - name: Type-check
         run: pnpm typecheck
 

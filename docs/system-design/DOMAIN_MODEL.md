@@ -106,6 +106,14 @@ erDiagram
 - `review_schedules` có unique `(user_id, question_id)` và giữ ease, interval, repetitions, due time, kết quả cùng confidence gần nhất. Mỗi MCQ submit cập nhật lịch theo biến thể SM-2 có ease floor 1.3.
 - Daily queue sort `due_at` tăng dần trước, sau đó mới bổ sung published MCQ chưa có schedule. Reset xóa riêng schedule của user; lịch sử answer không bị xóa.
 
+## Production hardening
+
+- `ai_calls` chỉ giữ operational metadata, token, cost estimate và correlation ID; không lưu prompt, answer hay raw provider response. `/ops` aggregate theo feature/model và cảnh báo dựa trên environment threshold.
+- Provider enforce hard limit riêng cho từng AI operation trước network I/O. Source, candidate text, code và diagram text luôn được đặt dưới instruction coi là untrusted data; output tiếp tục qua Zod schema.
+- Secret scan và offline golden regression là quality gate. Live eval dùng cùng dataset Frontend, Backend, DevOps, System Design và fail khi score lệch baseline vượt tolerance.
+- Privacy export chỉ trả dữ liệu thuộc authenticated user và loại private Blob locator. Delete xóa Blob trước, sau đó xóa audit event cần thiết và user để database cascade session/draft/answer/evaluation/schedule.
+- Security headers áp dụng toàn site. Server Actions vẫn authenticate bên trong action; private route handler kiểm tra auth và ownership trước khi đọc dữ liệu.
+
 ## Markdown ingestion
 
 - Markdown importer chỉ đọc directory nằm trong allowlist, canonicalize file path và đăng ký SHA-256 trước khi parse.

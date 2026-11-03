@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import type { AiCallLog } from '@/ai/ai-call-log';
 import type { AiProvider } from '@/ai/provider';
+import { AiProviderError } from '@/ai/provider';
 
 export const CODING_REVIEW_PROMPT_VERSION = 'code-001-v1';
 
@@ -30,7 +31,10 @@ export async function reviewCodeStatically(input: {
   rubric: unknown;
 }) {
   const correlationId = randomUUID();
-  const result = await input.provider.generateStructured({
+  const startedAt = performance.now();
+  let result;
+  try {
+    result = await input.provider.generateStructured({
     correlationId,
     feature: 'coding-static-review',
     promptVersion: CODING_REVIEW_PROMPT_VERSION,
@@ -51,7 +55,12 @@ export async function reviewCodeStatically(input: {
       rubric: input.rubric,
       executionStatus: 'not_run',
     }),
-  });
+    });
+  } catch (error) {
+    const mapped = error instanceof AiProviderError ? error : new AiProviderError('provider_unavailable', 'Không thể review code.', { cause: error, correlationId });
+    await input.logger.write({ correlationId, feature: 'coding-static-review', provider: input.provider.name, model: input.provider.model, promptVersion: CODING_REVIEW_PROMPT_VERSION, status: 'failed', errorCode: mapped.code, latencyMs: Math.round(performance.now() - startedAt) });
+    throw mapped.correlationId ? mapped : new AiProviderError(mapped.code, mapped.message, { cause: mapped, correlationId });
+  }
   const output = {
     ...result.output,
     score: Math.min(100, Math.max(0, result.output.score)),

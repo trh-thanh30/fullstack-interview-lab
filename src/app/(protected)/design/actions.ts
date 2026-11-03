@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { getDatabase } from '@/db/client';
+import { publicAiError } from '@/ai/public-error';
 import { requireAuthenticatedUser } from '@/lib/auth/dal';
 import {
   mermaidAttachmentSchema,
@@ -87,7 +88,7 @@ export async function reviewSystemDesignAction(
   } catch (error) {
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Không thể review checkpoint.',
+      message: publicAiError(error, error instanceof Error ? error.message : 'Không thể review checkpoint.'),
     };
   }
 }

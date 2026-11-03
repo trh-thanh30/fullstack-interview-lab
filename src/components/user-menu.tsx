@@ -1,4 +1,5 @@
-import { LogOut, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
+import Link from "next/link";
 
 import { signOutAction } from "@/app/(protected)/actions";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ export async function UserMenu() {
           <LogOut aria-hidden="true" />
         </Button>
       </form>
+      <Link aria-label="Cài đặt privacy" className="grid size-9 place-items-center rounded-md hover:bg-foreground/5" href="/settings/privacy"><Settings className="size-4" /></Link>
     </div>
   );
 }

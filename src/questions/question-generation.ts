@@ -134,7 +134,7 @@ export async function generateQuestionDraft(options: {
 }
 
 export class InvalidGeneratedQuestionError extends Error {
-  constructor(message: string) {
+  constructor(message: string, readonly correlationId?: string) {
     super(message);
     this.name = "InvalidGeneratedQuestionError";
   }

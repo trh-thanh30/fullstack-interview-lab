@@ -163,7 +163,15 @@ Mở `/learn` để xem số session hoàn thành, thời gian luyện, MCQ accu
 
 Recommendation xếp hạng topic bằng rule deterministic từ performance, recency và rubric gap, luôn hiển thị evidence cùng confidence. Gemini chỉ diễn giải kế hoạch từ ranking cố định. Mỗi MCQ cập nhật lịch spaced repetition từ kết quả và confidence; daily queue đưa câu overdue lên trước câu mới và cho phép reset từng lịch.
 
+## Production control room
+
+Mở `/ops` để theo dõi AI calls, token, estimated cost, error rate, P95 latency và correlation ID theo feature/model. Mỗi AI operation có hard limit input/image/output; threshold alert và retention lấy từ biến `AI_*`. Chạy `pnpm ops:prune-ai-logs` theo lịch vận hành để áp dụng retention.
+
+`pnpm quality` bao gồm secret scan và offline AI regression gate. Trước khi đổi model/prompt Production, cấu hình Gemini key rồi chạy `pnpm ai:eval:live`. Privacy controls tại `/settings/privacy` cho phép export JSON hoặc xóa dữ liệu cùng private Blob thuộc user.
+
+Quy trình migration, backup/restore, smoke test và rollback nằm trong [Production runbook](./docs/deployment/PRODUCTION_RUNBOOK.md).
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Phase vừa hoàn thành: Learning loop](./docs/roadmap/phase-7-learning-loop/README.md)
+- [Phase đang thực hiện: Production hardening](./docs/roadmap/phase-8-production/README.md)

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getDatabase } from "@/db/client";
+import { AiCallLogger } from "@/ai/ai-call-log";
 import { questionReviewActionValues } from "@/db/schema";
 import { requireAuthenticatedUser } from "@/lib/auth/dal";
 import { getRequiredEnv } from "@/lib/env";
@@ -80,10 +81,13 @@ export async function generateQuestionAction(
   let generatedQuestionId: string;
 
   try {
-    const repository = new QuestionStore(getDatabase());
+    const database = getDatabase();
+    const repository = new QuestionStore(database);
     const provider = new GeminiQuestionGenerationProvider(
       getRequiredEnv("GOOGLE_GENERATIVE_AI_API_KEY"),
       getRequiredEnv("GEMINI_QUESTION_MODEL"),
+      undefined,
+      new AiCallLogger(database),
     );
     const result = await generateQuestionDraft({
       repository,
@@ -95,12 +99,13 @@ export async function generateQuestionAction(
 
     generatedQuestionId = result.id;
   } catch (error) {
-    const message = error instanceof Error && (
+    const baseMessage = error instanceof Error && (
       error.message.includes("source") || error.message.includes("AI output")
     )
       ? error.message
       : "Không thể sinh câu hỏi lúc này. Hãy thử lại sau.";
-    return { message };
+    const correlationId = error && typeof error === "object" && "correlationId" in error ? String(error.correlationId) : "";
+    return { message: correlationId ? `${baseMessage} Mã theo dõi: ${correlationId}.` : baseMessage };
   }
 
   revalidatePath("/review");

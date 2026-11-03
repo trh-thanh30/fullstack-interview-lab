@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "quality": "pnpm check:test-layout && pnpm lint && pnpm typecheck && pnpm test:run && pnpm build",
+    "quality": "pnpm check:test-layout && pnpm security:secrets && pnpm ai:eval:check && pnpm lint && pnpm typecheck && pnpm test:run && pnpm build",
     "check:test-layout": "node tests/scripts/check-test-layout.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
@@ -24,7 +24,13 @@
     "source:scan": "tsx scripts/sources.ts scan",
     "source:import-markdown": "tsx scripts/import-markdown.ts",
     "source:import-pdf": "tsx scripts/import-pdf.ts",
-    "source:normalize": "tsx scripts/normalize-sources.ts"
+    "source:normalize": "tsx scripts/normalize-sources.ts",
+    "ops:prune-ai-logs": "tsx scripts/prune-ai-logs.ts",
+    "security:secrets": "node scripts/secret-scan.mjs",
+    "ai:eval:check": "vitest run src/ai/evals/tests/regression.test.ts",
+    "ai:eval:live": "tsx scripts/run-ai-evals.ts",
+    "release:verify-data": "tsx scripts/verify-production-data.ts",
+    "release:smoke": "tsx scripts/smoke-production.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "4.0.109",

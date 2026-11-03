@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { CodingStore, codingLanguages } from '@/coding/coding-store';
+import { publicAiError } from '@/ai/public-error';
 import { reviewAndPersistCode } from '@/coding/review-service';
 import { getDatabase } from '@/db/client';
 import { requireAuthenticatedUser } from '@/lib/auth/dal';
@@ -65,7 +66,7 @@ export async function reviewCodingAction(
   } catch (error) {
     return {
       status: 'error',
-      message: error instanceof Error ? error.message : 'Không thể review code lúc này.',
+      message: publicAiError(error, error instanceof Error ? error.message : 'Không thể review code lúc này.'),
     };
   }
 }

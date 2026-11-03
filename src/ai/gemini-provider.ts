@@ -2,6 +2,7 @@ import { createGoogle } from '@ai-sdk/google';
 import { APICallError, Output, streamText } from 'ai';
 
 import { AiProviderError, type AiProvider, type StructuredGenerationInput } from './provider';
+import { enforceAiOperationLimit } from './limits';
 
 export class GeminiStructuredProvider implements AiProvider {
   readonly name = 'google';
@@ -19,6 +20,7 @@ export class GeminiStructuredProvider implements AiProvider {
     const startedAt = performance.now();
 
     try {
+      const limit = enforceAiOperationLimit(input);
       const result = streamText({
         model: this.provider(this.model),
         output: Output.object({
@@ -43,7 +45,7 @@ export class GeminiStructuredProvider implements AiProvider {
               ],
             }
           : { prompt: input.input }),
-        maxOutputTokens: input.maxOutputTokens ?? 3_000,
+        maxOutputTokens: limit.maxOutputTokens,
         maxRetries: 1,
         timeout: 45_000,
         providerOptions: {
@@ -70,7 +72,7 @@ export class GeminiStructuredProvider implements AiProvider {
     } catch (error) {
       if (isAbortError(error)) {
         throw new AiProviderError('timeout', 'Gemini evaluation đã quá thời gian chờ.', {
-          cause: error,
+          cause: error, correlationId: input.correlationId,
         });
       }
       if (APICallError.isInstance(error)) {
@@ -78,25 +80,26 @@ export class GeminiStructuredProvider implements AiProvider {
           throw new AiProviderError(
             'invalid_output',
             'Gemini không chấp nhận structured output schema.',
-            { cause: error }
+            { cause: error, correlationId: input.correlationId }
           );
         }
         if (error.statusCode === 401 || error.statusCode === 403) {
           throw new AiProviderError('auth', 'Gemini API key chưa được cấu hình hợp lệ.', {
-            cause: error,
+            cause: error, correlationId: input.correlationId,
           });
         }
         if (error.statusCode === 429) {
           throw new AiProviderError('rate_limit', 'Gemini đang quá tải. Hãy thử lại sau.', {
-            cause: error,
+            cause: error, correlationId: input.correlationId,
           });
         }
         throw new AiProviderError('provider_unavailable', 'Gemini tạm thời không khả dụng.', {
-          cause: error,
+          cause: error, correlationId: input.correlationId,
         });
       }
+      if (error instanceof AiProviderError) throw error;
       throw new AiProviderError('invalid_output', 'Gemini output không đúng schema.', {
-        cause: error,
+        cause: error, correlationId: input.correlationId,
       });
     }
   }

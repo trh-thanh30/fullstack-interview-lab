@@ -831,6 +831,8 @@ Kiểm soát chi phí, lỗi, bảo mật và chất lượng AI trước khi d�
 
 ### Card OPS-001 — Observability và cost controls
 
+**Status:** DONE
+
 **Priority:** P0  
 **Size:** M  
 **Dependencies:** AI-001
@@ -839,17 +841,19 @@ Kiểm soát chi phí, lỗi, bảo mật và chất lượng AI trước khi d�
 
 **Tasks:**
 
-- [ ] Dashboard token usage và estimated cost theo feature/model.
-- [ ] Đặt max input/output token cho từng AI operation.
-- [ ] Alert khi tỷ lệ lỗi hoặc chi phí vượt ngưỡng.
-- [ ] Retention policy cho prompt/response logs.
+- [x] Dashboard token usage và estimated cost theo feature/model.
+- [x] Đặt max input/output token cho từng AI operation.
+- [x] Alert khi tỷ lệ lỗi hoặc chi phí vượt ngưỡng.
+- [x] Retention policy cho prompt/response logs.
 
 **Acceptance criteria:**
 
-- [ ] Có thể truy từ UI error tới server correlation ID.
-- [ ] Một source quá lớn không thể tạo request vượt giới hạn đã đặt.
+- [x] Có thể truy từ UI error tới server correlation ID.
+- [x] Một source quá lớn không thể tạo request vượt giới hạn đã đặt.
 
 ### Card OPS-002 — Security và privacy review
+
+**Status:** DONE
 
 **Priority:** P0  
 **Size:** M  
@@ -859,19 +863,21 @@ Kiểm soát chi phí, lỗi, bảo mật và chất lượng AI trước khi d�
 
 **Tasks:**
 
-- [ ] Kiểm tra authorization trên mọi mutation/read riêng tư.
-- [ ] Thêm security headers và CSRF-safe patterns.
-- [ ] Validate upload, URL và AI input ở server.
-- [ ] Kiểm tra prompt injection từ imported content.
-- [ ] Thêm chức năng export và xóa dữ liệu cá nhân.
+- [x] Kiểm tra authorization trên mọi mutation/read riêng tư.
+- [x] Thêm security headers và CSRF-safe patterns.
+- [x] Validate upload, URL và AI input ở server.
+- [x] Kiểm tra prompt injection từ imported content.
+- [x] Thêm chức năng export và xóa dữ liệu cá nhân.
 
 **Acceptance criteria:**
 
-- [ ] Người dùng không thể đọc session bằng ID đoán được nếu không được phép.
-- [ ] Imported source không thể thay developer/system instruction.
-- [ ] Secret scan không phát hiện credential trong repository.
+- [x] Người dùng không thể đọc session bằng ID đoán được nếu không được phép.
+- [x] Imported source không thể thay developer/system instruction.
+- [x] Secret scan không phát hiện credential trong repository.
 
 ### Card OPS-003 — AI evaluation regression suite
+
+**Status:** DONE
 
 **Priority:** P0  
 **Size:** L  
@@ -881,17 +887,19 @@ Kiểm soát chi phí, lỗi, bảo mật và chất lượng AI trước khi d�
 
 **Tasks:**
 
-- [ ] Tạo golden dataset gồm answer tốt, trung bình, sai và cố tình đánh lừa.
-- [ ] Kiểm tra schema validity và score range tự động.
-- [ ] So sánh evaluation mới với baseline có tolerance.
-- [ ] Chạy eval thủ công trước khi đổi production model/prompt.
+- [x] Tạo golden dataset gồm answer tốt, trung bình, sai và cố tình đánh lừa.
+- [x] Kiểm tra schema validity và score range tự động.
+- [x] So sánh evaluation mới với baseline có tolerance.
+- [x] Chạy eval thủ công trước khi đổi production model/prompt.
 
 **Acceptance criteria:**
 
-- [ ] Dataset bao phủ ít nhất Frontend, Backend, DevOps và System Design.
-- [ ] Prompt/model version mới không deploy khi regression vượt threshold.
+- [x] Dataset bao phủ ít nhất Frontend, Backend, DevOps và System Design.
+- [x] Prompt/model version mới không deploy khi regression vượt threshold.
 
 ### Card OPS-004 — Production release
+
+**Status:** IN_PROGRESS
 
 **Priority:** P0  
 **Size:** M  
@@ -905,13 +913,13 @@ Kiểm soát chi phí, lỗi, bảo mật và chất lượng AI trước khi d�
 - [ ] Seed taxonomy, source metadata và question đã duyệt.
 - [ ] Cấu hình custom domain nếu cần.
 - [ ] Smoke test auth, MCQ, self-answer, mock interview và report.
-- [ ] Ghi lại rollback và database recovery procedure.
+- [x] Ghi lại rollback và database recovery procedure.
 
 **Acceptance criteria:**
 
 - [ ] Production smoke test pass.
 - [ ] Có ít nhất một bản backup hoặc recovery path đã kiểm tra.
-- [ ] Rollback application không yêu cầu rollback phá hủy database.
+- [x] Rollback application không yêu cầu rollback phá hủy database.
 
 ---
 

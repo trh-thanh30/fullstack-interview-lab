@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { AiProviderError } from "@/ai/provider";
+import { publicAiError } from "@/ai/public-error";
 import { getDatabase } from "@/db/client";
 import { EssayStore } from "@/essay/essay-store";
 import { evaluateAndPersistEssay } from "@/essay/evaluation-service";
@@ -84,7 +85,7 @@ export async function retryEssayEvaluationAction(
 }
 
 function publicEssayError(error: unknown) {
-  if (error instanceof AiProviderError) return `${error.message} Attempt đã được lưu, bạn có thể retry.`;
+  if (error instanceof AiProviderError) return `${publicAiError(error, error.message)} Attempt đã được lưu, bạn có thể retry.`;
   if (error instanceof Error && /^(Câu|Session|Answer|Không thể)/.test(error.message)) return error.message;
   return "Không thể đánh giá lúc này. Attempt đã được lưu để bạn retry.";
 }

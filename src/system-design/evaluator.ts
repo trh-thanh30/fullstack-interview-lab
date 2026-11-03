@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import type { AiCallLog } from "@/ai/ai-call-log";
 import type { AiProvider } from "@/ai/provider";
+import { AiProviderError } from "@/ai/provider";
 import type { SystemDesignRubricDimension } from "@/db/schema";
 
 export const SYSTEM_DESIGN_PROMPT_VERSION = "sys-001-v1";
@@ -41,7 +42,10 @@ export async function evaluateSystemDesign(input: {
   images?: Array<{ data: Uint8Array; mediaType: "image/png" | "image/jpeg" | "image/webp" }>;
 }) {
   const correlationId = randomUUID();
-  const result = await input.provider.generateStructured({
+  const startedAt = performance.now();
+  let result;
+  try {
+    result = await input.provider.generateStructured({
     correlationId,
     feature: "system-design-review",
     promptVersion: SYSTEM_DESIGN_PROMPT_VERSION,
@@ -58,7 +62,12 @@ export async function evaluateSystemDesign(input: {
     input: JSON.stringify({ problem: input.problem, checkpoint: input.checkpoint, checkpointPrompt: input.checkpointPrompt, candidateNotes: input.notes, previousNotes: input.previousNotes }),
     images: input.images,
     maxOutputTokens: 3_500,
-  });
+    });
+  } catch (error) {
+    const mapped = error instanceof AiProviderError ? error : new AiProviderError("provider_unavailable", "Không thể review system design.", { cause: error, correlationId });
+    await input.logger.write({ correlationId, feature: "system-design-review", provider: input.provider.name, model: input.provider.model, promptVersion: SYSTEM_DESIGN_PROMPT_VERSION, status: "failed", errorCode: mapped.code, latencyMs: Math.round(performance.now() - startedAt) });
+    throw mapped.correlationId ? mapped : new AiProviderError(mapped.code, mapped.message, { cause: mapped, correlationId });
+  }
   const dimensionScores = Object.fromEntries(rubricKeys.map((key) => [key, clamp(result.output.dimensionScores[key])])) as SystemDesignReviewOutput["dimensionScores"];
   const weights = new Map(input.problem.rubric.map(({ key, weight }) => [key, weight]));
   const weightTotal = rubricKeys.reduce((sum, key) => sum + (weights.get(key) ?? 0), 0) || 100;

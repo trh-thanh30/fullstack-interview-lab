@@ -39,6 +39,7 @@ export type AiErrorCode =
   | 'rate_limit'
   | 'timeout'
   | 'refusal'
+  | 'input_limit'
   | 'invalid_output'
   | 'provider_unavailable';
 
@@ -46,9 +47,12 @@ export class AiProviderError extends Error {
   constructor(
     readonly code: AiErrorCode,
     message: string,
-    options?: { cause?: unknown }
+    options?: { cause?: unknown; correlationId?: string }
   ) {
     super(message, options);
     this.name = 'AiProviderError';
+    this.correlationId = options?.correlationId;
   }
+
+  readonly correlationId?: string;
 }

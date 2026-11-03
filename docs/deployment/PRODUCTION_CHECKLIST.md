@@ -7,6 +7,7 @@
 - [ ] Preview deployment xuất hiện trên pull request thử nghiệm.
 - [ ] Neon Development, Preview và Production được tách riêng.
 - [ ] Migration đã chạy trên database Preview trước Production.
+- [ ] Neon snapshot/PITR recovery path đã được restore thử vào branch riêng.
 - [ ] GitHub OAuth App production dùng callback `https://<production-domain>/api/auth/callback/github`.
 - [ ] `AUTH_SECRET`, OAuth credentials và database credential không xuất hiện trong source hoặc build log.
 - [ ] `ALLOWED_EMAILS` Production chỉ chứa tài khoản được phê duyệt.
@@ -17,12 +18,15 @@
 - [ ] `pnpm lint` pass.
 - [ ] `pnpm typecheck` pass.
 - [ ] `pnpm test:run` pass.
+- [ ] `pnpm security:secrets` pass.
+- [ ] `pnpm ai:eval:check` và `pnpm ai:eval:live` pass với production model.
 - [ ] `pnpm build` pass.
 - [ ] Preview smoke test: `/sign-in` trả `200`.
 - [ ] Preview smoke test: truy cập route private khi chưa login chuyển về `/sign-in`.
 - [ ] Preview smoke test: `/api/me` trả `401` khi chưa login.
 - [ ] Đăng nhập bằng email allowlist thành công trên môi trường đích.
 - [ ] Email ngoài allowlist bị từ chối.
+- [ ] `pnpm release:smoke` pass với `PRODUCTION_URL` và smoke account cookie.
 
 ## Deploy Production
 
@@ -32,6 +36,8 @@
 4. Merge pull request vào `main`; Vercel Git integration tạo Production deployment.
 5. Kiểm tra deployment log và function log không chứa secret hoặc lỗi Auth.js/database.
 6. Chạy lại ba smoke test và một login thật trên production domain.
+
+Chi tiết thao tác, database recovery và incident flow nằm trong [`PRODUCTION_RUNBOOK.md`](./PRODUCTION_RUNBOOK.md).
 
 ## Rollback
 

@@ -76,22 +76,22 @@ export default function DashboardPage() {
                 <p className="text-[11px] font-extrabold tracking-[0.18em] text-muted-foreground uppercase">
                   Tiếp theo
                 </p>
-                <h2 className="mt-2 text-xl font-extrabold">Learning loop</h2>
+                <h2 className="mt-2 text-xl font-extrabold">Production hardening</h2>
               </div>
               <span className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-extrabold text-accent-ink">
-                Phase 7
+                Phase 8
               </span>
             </div>
             <div className="mt-8 h-2 overflow-hidden rounded-full bg-ink/8">
-              <div className="h-full w-full rounded-full bg-accent-strong" />
+                <div className="h-full w-3/4 rounded-full bg-accent-strong" />
             </div>
             <div className="mt-3 flex justify-between text-xs font-bold text-muted-foreground">
-              <span>Dashboard · Weak topics · Review</span>
-              <span>3 / 3 cards</span>
+              <span>Ops · Security · Eval · Release</span>
+              <span>3 / 4 cards</span>
             </div>
             <div className="mt-7 flex items-center gap-3 border-t border-ink/10 pt-5 text-sm font-bold">
               <CircleDot className="size-4 text-accent-ink" aria-hidden="true" />
-              Progress radar và daily review đã sẵn sàng
+              Source hardening xong · chờ production release
             </div>
           </div>
         </div>

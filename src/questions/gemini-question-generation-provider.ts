@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { GeminiStructuredProvider } from "@/ai/gemini-provider";
+import type { AiCallLog } from "@/ai/ai-call-log";
 import { AiProviderError, type AiProvider } from "@/ai/provider";
 
 import {
@@ -16,14 +17,17 @@ export class GeminiQuestionGenerationProvider implements QuestionGenerationProvi
     apiKey: string,
     private readonly model: string,
     provider?: AiProvider,
+    private readonly logger?: { write(entry: AiCallLog): Promise<void> },
   ) {
     this.provider = provider ?? new GeminiStructuredProvider(apiKey, model);
   }
 
   async generate(input: Parameters<QuestionGenerationProvider["generate"]>[0]) {
+    const correlationId = randomUUID();
+    const startedAt = performance.now();
     try {
       const result = await this.provider.generateStructured({
-        correlationId: randomUUID(),
+        correlationId,
         feature: "question-generation",
         promptVersion: input.promptVersion,
         instructions: buildInstructions(input.type),
@@ -33,6 +37,8 @@ export class GeminiQuestionGenerationProvider implements QuestionGenerationProvi
         maxOutputTokens: 4_000,
       });
 
+      await this.logger?.write({ correlationId, feature: "question-generation", provider: this.provider.name, model: result.model, promptVersion: input.promptVersion, status: "succeeded", latencyMs: result.latencyMs, usage: result.usage });
+
       return {
         output: result.output,
         providerResponseId: result.providerResponseId ?? result.correlationId,
@@ -41,6 +47,7 @@ export class GeminiQuestionGenerationProvider implements QuestionGenerationProvi
         outputTokens: result.usage.outputTokens,
       };
     } catch (error) {
+      await this.logger?.write({ correlationId, feature: "question-generation", provider: this.provider.name, model: this.provider.model, promptVersion: input.promptVersion, status: "failed", errorCode: error instanceof AiProviderError ? error.code : "invalid_output", latencyMs: Math.round(performance.now() - startedAt) });
       if (
         error instanceof AiProviderError &&
         error.code !== "invalid_output" &&
@@ -48,7 +55,7 @@ export class GeminiQuestionGenerationProvider implements QuestionGenerationProvi
       ) {
         throw error;
       }
-      throw new InvalidGeneratedQuestionError("Gemini output không thể parse theo question schema.");
+      throw new InvalidGeneratedQuestionError("Gemini output không thể parse theo question schema.", correlationId);
     }
   }
 }
