@@ -78,6 +78,19 @@ export function QuizPlayer({ session }: { session: SessionDTO }) {
         </CardHeader>
         <CardContent className="px-5 sm:px-8">
           <form action={action} className="space-y-3" ref={submitFormRef}>
+            <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-dashed bg-muted/25 p-3">
+              <span className="mr-1 text-xs font-extrabold tracking-wide text-muted-foreground uppercase">Confidence</span>
+              {[
+                { value: 1, label: "Đang đoán" },
+                { value: 2, label: "Khá chắc" },
+                { value: 3, label: "Rất chắc" },
+              ].map((item) => (
+                <label className="cursor-pointer" key={item.value}>
+                  <input className="peer sr-only" defaultChecked={item.value === 2} disabled={answered} name="confidence" type="radio" value={item.value} />
+                  <span className="inline-flex rounded-full border bg-background px-3 py-1.5 text-xs font-bold peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background">{item.label}</span>
+                </label>
+              ))}
+            </div>
             {session.question.choices.map((choice, index) => {
               const selected = selectedChoiceId === choice.id;
               const correct = session.answer?.correctChoiceIds.includes(choice.id);

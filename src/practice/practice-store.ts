@@ -18,6 +18,8 @@ import {
 } from "@/db/schema";
 
 import type { PracticeConfiguration } from "./practice-config";
+import { LearningStore } from "@/learning/learning-store";
+import type { ReviewConfidence } from "@/learning/spaced-repetition";
 
 export class PracticeStore {
   constructor(private readonly database: Database) {}
@@ -82,9 +84,11 @@ export class PracticeStore {
       throw new Error(`Chỉ có ${candidates.length} câu hỏi hợp lệ, ít hơn ${requestedCount} câu đã chọn.`);
     }
 
-    const ordered = input.configuration.strategy === "weak_first" && !input.questionIds
-      ? await this.prioritizeWeakQuestions(input.userId, candidates)
-      : shuffle(candidates);
+    const ordered = input.questionIds
+      ? input.questionIds.flatMap((id) => candidates.find((candidate) => candidate.id === id) ?? [])
+      : input.configuration.strategy === "weak_first"
+        ? await this.prioritizeWeakQuestions(input.userId, candidates)
+        : shuffle(candidates);
     const selected = ordered.slice(0, requestedCount);
     const questionIds = selected.map(({ id }) => id);
     const [choiceRows, sourceRows] = await Promise.all([
@@ -242,6 +246,7 @@ export class PracticeStore {
     sessionId: string;
     sessionQuestionId: string;
     selectedChoiceId: string;
+    confidence?: ReviewConfidence;
     now?: Date;
   }) {
     const session = await this.getOwnedSession(input.userId, input.sessionId);
@@ -269,17 +274,31 @@ export class PracticeStore {
     if (existing) throw new Error("Câu hỏi này đã được trả lời.");
 
     const isCorrect = question.answerKeySnapshot.includes(input.selectedChoiceId);
-    const inserted = await this.database
+    const confidence = input.confidence ?? 2;
+    const now = input.now ?? new Date();
+    const learning = question.questionId
+      ? await new LearningStore(this.database).prepareReview({
+          userId: input.userId,
+          questionId: question.questionId,
+          correct: isCorrect,
+          confidence,
+          reviewedAt: now,
+        })
+      : null;
+    const answerStatement = this.database
       .insert(answers)
       .values({
         sessionQuestionId: question.id,
         attemptNumber: 1,
         selectedChoiceIds: [input.selectedChoiceId],
         isCorrect,
-        submittedAt: input.now ?? new Date(),
+        confidence,
+        submittedAt: now,
       })
-      .onConflictDoNothing()
       .returning({ id: answers.id });
+    const [inserted] = learning
+      ? await this.database.batch([answerStatement, learning.statement])
+      : [await answerStatement];
     if (!inserted.length) throw new Error("Câu hỏi này đã được trả lời.");
     return isCorrect;
   }

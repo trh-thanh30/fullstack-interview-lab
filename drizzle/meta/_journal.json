@@ -71,6 +71,13 @@
       "when": 1793433971403,
       "tag": "0009_flaky_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793697635325,
+      "tag": "0010_sleepy_ricochet",
+      "breakpoints": true
     }
   ]
 }

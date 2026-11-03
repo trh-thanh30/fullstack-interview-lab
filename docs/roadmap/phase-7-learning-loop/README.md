@@ -8,14 +8,20 @@ Biến lịch sử làm bài thành kế hoạch ôn tập có ích thay vì ch�
 
 ## Cards
 
-- [ ] [LEARN-001 — Progress dashboard](./LEARN-001.md)
-- [ ] [LEARN-002 — Weak-topic recommendations](./LEARN-002.md)
-- [ ] [LEARN-003 — Spaced repetition](./LEARN-003.md)
+- [x] [LEARN-001 — Progress dashboard](./LEARN-001.md)
+- [x] [LEARN-002 — Weak-topic recommendations](./LEARN-002.md)
+- [x] [LEARN-003 — Spaced repetition](./LEARN-003.md)
 
 ## Exit criteria
 
-- [ ] Dashboard phản ánh đúng dữ liệu session.
-- [ ] Có thể tạo practice set từ topic yếu hoặc câu đến hạn ôn lại.
+- [x] Dashboard phản ánh đúng dữ liệu session.
+- [x] Có thể tạo practice set từ topic yếu hoặc câu đến hạn ôn lại.
+
+## Verification
+
+- Migration `0010_sleepy_ricochet.sql` thêm review schedule và MCQ confidence.
+- `/learn` có filter thời gian, empty/loading/error state, recommendation action và daily queue.
+- `pnpm quality` pass với 39 test files / 92 tests.
 
 ## Điều hướng
 

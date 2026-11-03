@@ -71,6 +71,7 @@ describe("initial database migration", () => {
         "design_attachments",
         "coding_drafts",
         "coding_reviews",
+        "review_schedules",
       ]),
     );
 

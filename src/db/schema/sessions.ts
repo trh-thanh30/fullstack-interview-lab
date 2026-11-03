@@ -122,6 +122,7 @@ export const answers = pgTable(
     answerText: text("answer_text"),
     selectedChoiceIds: jsonb("selected_choice_ids").$type<string[]>().default([]).notNull(),
     isCorrect: boolean("is_correct"),
+    confidence: integer("confidence"),
     submittedAt: timestamp("submitted_at", { mode: "date", withTimezone: true })
       .defaultNow()
       .notNull(),

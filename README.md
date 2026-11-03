@@ -157,7 +157,13 @@ Mở `/design` để chọn một trong ba problem template đã review và đi 
 
 Mở `/coding` để chọn coding question đã publish, viết JavaScript/TypeScript bằng CodeMirror và lưu language, code cùng explanation. Workspace không chạy code trong Vercel Function. Gemini chỉ static review complexity, correctness assumptions và edge cases; mọi review persist `execution_status = not_run` và hiển thị rõ code chưa được thực thi.
 
+## Learning loop
+
+Mở `/learn` để xem số session hoàn thành, thời gian luyện, MCQ accuracy, score trend và breakdown theo topic, technology, level cùng rubric dimension. Filter hỗ trợ 7/30/90 ngày hoặc toàn bộ lịch sử; session abandoned không được tính.
+
+Recommendation xếp hạng topic bằng rule deterministic từ performance, recency và rubric gap, luôn hiển thị evidence cùng confidence. Gemini chỉ diễn giải kế hoạch từ ranking cố định. Mỗi MCQ cập nhật lịch spaced repetition từ kết quả và confidence; daily queue đưa câu overdue lên trước câu mới và cho phép reset từng lịch.
+
 ## Roadmap
 
 - [Roadmap theo từng feature card](./docs/roadmap/README.md)
-- [Phase vừa hoàn thành: System design và coding](./docs/roadmap/phase-6-system-design-coding/README.md)
+- [Phase vừa hoàn thành: Learning loop](./docs/roadmap/phase-7-learning-loop/README.md)

@@ -31,6 +31,8 @@ erDiagram
   answers ||--o{ evaluations : evaluated
   rubrics o|--o{ evaluations : applies
   ai_calls ||--o| evaluations : traces
+  users ||--o{ review_schedules : studies
+  questions ||--o{ review_schedules : schedules
 ```
 
 ## Quyết định chính
@@ -95,6 +97,14 @@ erDiagram
 - Private image chỉ được stream qua authenticated route hoặc tải server-side thành bytes cho Gemini multimodal input. Xóa image gọi Blob `del` trước khi xóa metadata.
 - Coding session snapshot published coding question/rubric. `coding_drafts` giữ language, code, explanation; `coding_reviews` giữ đúng source snapshot đã review.
 - Web tier không có code runner. Mọi coding review có `execution_status = not_run`; prompt và UI cấm tuyên bố test pass hoặc code chạy đúng khi không có execution evidence.
+
+## Learning loop
+
+- Dashboard chỉ aggregate session ở state `completed` hoặc `summary`; session `abandoned` không đóng góp session count, duration, accuracy hay recommendation evidence.
+- Weakness ranking chạy deterministic từ 55% performance gap, 25% recency risk và 20% rubric gap. Mỗi recommendation giữ evidence, sample size và confidence; dưới ba mẫu luôn được ghi `low`.
+- Gemini nhận ranking đã cố định và chỉ tạo narrative/action text. Model không ghi đè score, evidence hoặc thứ tự topic.
+- `review_schedules` có unique `(user_id, question_id)` và giữ ease, interval, repetitions, due time, kết quả cùng confidence gần nhất. Mỗi MCQ submit cập nhật lịch theo biến thể SM-2 có ease floor 1.3.
+- Daily queue sort `due_at` tăng dần trước, sau đó mới bổ sung published MCQ chưa có schedule. Reset xóa riêng schedule của user; lịch sử answer không bị xóa.
 
 ## Markdown ingestion
 

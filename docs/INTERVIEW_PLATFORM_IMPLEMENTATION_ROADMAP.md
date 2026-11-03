@@ -752,6 +752,8 @@ Biến lịch sử làm bài thành kế hoạch ôn tập có ích thay vì ch�
 
 ### Card LEARN-001 — Progress dashboard
 
+**Status:** DONE
+
 **Priority:** P1  
 **Size:** M  
 **Dependencies:** MCQ-004, AI-004
@@ -760,17 +762,19 @@ Biến lịch sử làm bài thành kế hoạch ôn tập có ích thay vì ch�
 
 **Tasks:**
 
-- [ ] Hiển thị số session, thời gian luyện và accuracy.
-- [ ] Hiển thị score trend cho self-answer và mock interview.
-- [ ] Phân tích theo category, technology và rubric dimension.
-- [ ] Có filter theo khoảng thời gian.
+- [x] Hiển thị số session, thời gian luyện và accuracy.
+- [x] Hiển thị score trend cho self-answer và mock interview.
+- [x] Phân tích theo category, technology và rubric dimension.
+- [x] Có filter theo khoảng thời gian.
 
 **Acceptance criteria:**
 
-- [ ] Dashboard query không tính session abandoned vào điểm hoàn thành.
-- [ ] Empty state hướng người dùng tới practice đầu tiên.
+- [x] Dashboard query không tính session abandoned vào điểm hoàn thành.
+- [x] Empty state hướng người dùng tới practice đầu tiên.
 
 ### Card LEARN-002 — Weak-topic recommendations
+
+**Status:** DONE
 
 **Priority:** P1  
 **Size:** M  
@@ -780,17 +784,19 @@ Biến lịch sử làm bài thành kế hoạch ôn tập có ích thay vì ch�
 
 **Tasks:**
 
-- [ ] Tính weakness score từ recency, accuracy và rubric dimension.
-- [ ] Dùng rule deterministic để xếp hạng topic.
-- [ ] Dùng AI chỉ để diễn giải kế hoạch, không tự sửa thống kê.
-- [ ] Cho phép tạo session trực tiếp từ recommendation.
+- [x] Tính weakness score từ recency, accuracy và rubric dimension.
+- [x] Dùng rule deterministic để xếp hạng topic.
+- [x] Dùng AI chỉ để diễn giải kế hoạch, không tự sửa thống kê.
+- [x] Cho phép tạo session trực tiếp từ recommendation.
 
 **Acceptance criteria:**
 
-- [ ] Recommendation luôn giải thích được bằng dữ liệu lịch sử.
-- [ ] Topic chưa đủ sample được ghi rõ là độ tin cậy thấp.
+- [x] Recommendation luôn giải thích được bằng dữ liệu lịch sử.
+- [x] Topic chưa đủ sample được ghi rõ là độ tin cậy thấp.
 
 ### Card LEARN-003 — Spaced repetition
+
+**Status:** DONE
 
 **Priority:** P2  
 **Size:** M  
@@ -800,14 +806,14 @@ Biến lịch sử làm bài thành kế hoạch ôn tập có ích thay vì ch�
 
 **Tasks:**
 
-- [ ] Lưu ease, interval, dueAt và lần review gần nhất.
-- [ ] Cập nhật lịch dựa trên kết quả, confidence và lần trả lời.
-- [ ] Tạo daily review queue.
+- [x] Lưu ease, interval, dueAt và lần review gần nhất.
+- [x] Cập nhật lịch dựa trên kết quả, confidence và lần trả lời.
+- [x] Tạo daily review queue.
 
 **Acceptance criteria:**
 
-- [ ] Câu overdue được ưu tiên trước câu mới khi chọn review mode.
-- [ ] Người dùng có thể reset lịch của một câu.
+- [x] Câu overdue được ưu tiên trước câu mới khi chọn review mode.
+- [x] Người dùng có thể reset lịch của một câu.
 
 ---
 

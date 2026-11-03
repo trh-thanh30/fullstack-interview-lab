@@ -1,6 +1,6 @@
 # Card LEARN-003 — Spaced repetition
 
-**Status:** TODO
+**Status:** DONE
 
 
 **Priority:** P2  
@@ -11,12 +11,18 @@
 
 **Tasks:**
 
-- [ ] Lưu ease, interval, dueAt và lần review gần nhất.
-- [ ] Cập nhật lịch dựa trên kết quả, confidence và lần trả lời.
-- [ ] Tạo daily review queue.
+- [x] Lưu ease, interval, dueAt và lần review gần nhất.
+- [x] Cập nhật lịch dựa trên kết quả, confidence và lần trả lời.
+- [x] Tạo daily review queue.
 
 **Acceptance criteria:**
 
-- [ ] Câu overdue được ưu tiên trước câu mới khi chọn review mode.
-- [ ] Người dùng có thể reset lịch của một câu.
+- [x] Câu overdue được ưu tiên trước câu mới khi chọn review mode.
+- [x] Người dùng có thể reset lịch của một câu.
+
+## Implementation notes
+
+- `review_schedules` lưu ease, interval, repetitions, due time, last result/confidence và ownership theo user.
+- MCQ player thu confidence 1–3; biến thể SM-2 reset câu sai về một ngày và có ease floor 1.3.
+- Daily queue sort overdue theo `due_at` trước khi thêm câu mới; session giữ đúng thứ tự explicit question IDs và reset không xóa answer history.
 

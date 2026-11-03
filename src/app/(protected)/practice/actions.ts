@@ -40,7 +40,13 @@ export async function submitMcqAnswerAction(
   formData: FormData,
 ): Promise<PracticeActionState> {
   const user = await requireAuthenticatedUser();
-  const parsed = z.uuid().safeParse(formData.get("selectedChoiceId"));
+  const parsed = z.object({
+    selectedChoiceId: z.uuid(),
+    confidence: z.coerce.number().int().min(1).max(3),
+  }).safeParse({
+    selectedChoiceId: formData.get("selectedChoiceId"),
+    confidence: formData.get("confidence"),
+  });
   if (!parsed.success) return { message: "Hãy chọn một đáp án trước khi submit." };
 
   try {
@@ -48,7 +54,8 @@ export async function submitMcqAnswerAction(
       userId: user.id,
       sessionId,
       sessionQuestionId,
-      selectedChoiceId: parsed.data,
+      selectedChoiceId: parsed.data.selectedChoiceId,
+      confidence: parsed.data.confidence as 1 | 2 | 3,
     });
   } catch (error) {
     return { message: safePracticeError(error, "Không thể lưu đáp án.") };
