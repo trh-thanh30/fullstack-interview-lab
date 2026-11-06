@@ -32,7 +32,7 @@ type Candidate = {
   prompt: string;
   explanation: string | null;
   type: 'short_answer' | 'deep_dive';
-  level: 'junior' | 'middle' | 'senior';
+  level: 'fresher' | 'junior' | 'middle' | 'senior';
   topicId: string;
   topicName: string;
   rubricId: string;

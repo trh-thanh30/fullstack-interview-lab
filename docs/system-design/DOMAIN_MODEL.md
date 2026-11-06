@@ -151,4 +151,6 @@ pnpm db:seed
 pnpm db:studio
 ```
 
+Seed mặc định là idempotent và bao gồm taxonomy, 608 câu hỏi: bộ fullstack web, 271 MCQ Fresher fullstack, 60 câu trọng tâm `Java–MySQL Exam` và 34 câu `Java–MySQL Extended`, cùng ba system-design templates đã review. Câu hỏi dùng deterministic ID để có thể cập nhật content pack mà không nhân bản dữ liệu.
+
 `DATABASE_URL` chỉ nằm trong `.env.local` hoặc environment của Vercel. Test integration dùng PGlite in-memory kèm pgvector để chạy migration trên database rỗng.

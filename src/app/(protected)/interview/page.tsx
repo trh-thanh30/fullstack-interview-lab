@@ -131,6 +131,7 @@ async function InterviewIndex() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="fresher">Fresher</SelectItem>
                     <SelectItem value="junior">Junior</SelectItem>
                     <SelectItem value="middle">Middle</SelectItem>
                     <SelectItem value="senior">Senior</SelectItem>

@@ -8,7 +8,7 @@ export const questionTypeValues = [
   "coding",
 ] as const;
 
-export const questionLevelValues = ["junior", "middle", "senior"] as const;
+export const questionLevelValues = ["fresher", "junior", "middle", "senior"] as const;
 
 export const questionStatusValues = [
   "draft",

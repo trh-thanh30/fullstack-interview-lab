@@ -23,6 +23,18 @@ export const topicSeed = [
     description: "System design, application architecture và design patterns.",
     position: 4,
   },
+  {
+    slug: "java-sql-exam",
+    name: "Java–MySQL Exam",
+    description: "Ôn trắc nghiệm SQL, JDBC, Swing, NetBeans và XAMPP theo đề Công nghệ Java.",
+    position: 5,
+  },
+  {
+    slug: "java-sql-extended",
+    name: "Java–MySQL Extended",
+    description: "Kiến thức Java, SQL và Swing mở rộng, tách khỏi bộ ôn kiểm tra trọng tâm.",
+    position: 6,
+  },
 ] as const;
 
 export const technologySeed = [
@@ -44,6 +56,11 @@ export const technologySeed = [
   { slug: "system-design", name: "System Design", topicSlug: "architecture" },
   { slug: "design-patterns", name: "Design Patterns", topicSlug: "architecture" },
   { slug: "clean-architecture", name: "Clean Architecture", topicSlug: "architecture" },
+  { slug: "java", name: "Java", topicSlug: "java-sql-exam" },
+  { slug: "jdbc", name: "JDBC", topicSlug: "java-sql-exam" },
+  { slug: "mysql", name: "MySQL", topicSlug: "java-sql-exam" },
+  { slug: "java-swing", name: "Java Swing", topicSlug: "java-sql-exam" },
+  { slug: "netbeans-xampp", name: "NetBeans/XAMPP", topicSlug: "java-sql-exam" },
 ] as const;
 
 export const systemDesignProblemSeed = [

@@ -3,12 +3,15 @@ import { z } from "zod";
 import { questionLevelValues } from "@/db/schema";
 
 export const practiceStrategyValues = ["random", "weak_first"] as const;
+export const practiceQuestionCountOptions = [1, 3, 5, 10, 15, 20, 30, 50, 60, 75, 100, 150, 200] as const;
+export const maxPracticeQuestionCount = 200;
+const maxTechnologyFilters = 50;
 
 export const practiceConfigurationSchema = z.object({
   topicId: z.union([z.uuid(), z.literal("")]).transform((value) => value || undefined),
-  technologyIds: z.array(z.uuid()).max(8),
+  technologyIds: z.array(z.uuid()).max(maxTechnologyFilters),
   level: z.union([z.enum(questionLevelValues), z.literal("")]).transform((value) => value || undefined),
-  questionCount: z.coerce.number().int().min(1).max(50),
+  questionCount: z.coerce.number().int().min(1).max(maxPracticeQuestionCount),
   strategy: z.enum(practiceStrategyValues),
 });
 

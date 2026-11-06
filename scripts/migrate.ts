@@ -1,9 +1,11 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { migrate } from "drizzle-orm/neon-http/migrator";
 
 import { getRequiredEnv } from "../src/lib/env";
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 

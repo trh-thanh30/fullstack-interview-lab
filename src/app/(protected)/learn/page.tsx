@@ -192,7 +192,7 @@ async function LearningContent({
         </div>
       </section>
 
-      {dashboard.levels.length ? <section><Breakdown title="Level" subtitle="Junior · Middle · Senior" rows={dashboard.levels} /></section> : null}
+      {dashboard.levels.length ? <section><Breakdown title="Level" subtitle="Fresher · Junior · Middle · Senior" rows={dashboard.levels} /></section> : null}
     </div>
   );
 }

@@ -75,6 +75,8 @@ pnpm db:seed
 pnpm db:studio
 ```
 
+`db:seed` idempotently tạo taxonomy, 608 câu hỏi đã publish cho Practice/Essay/Interview/Coding. Trong đó có 271 MCQ Fresher fullstack, 60 câu trọng tâm thuộc `Java–MySQL Exam`, 34 câu thuộc `Java–MySQL Extended`, cùng ba system-design templates. Chạy lại command sẽ cập nhật question pack theo khóa ổn định, không tạo bản sao.
+
 Migration integration test dùng PostgreSQL in-memory qua PGlite và pgvector, vì vậy có thể xác nhận migration chạy từ database trống mà không cần dùng database production.
 
 ## Source registry

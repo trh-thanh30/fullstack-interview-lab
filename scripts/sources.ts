@@ -1,8 +1,10 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 
 import { DrizzleSourceRegistryStore } from "../src/content/drizzle-source-registry-store";
 import { createFileSourceInput, discoverSourceFiles } from "../src/content/file-sources";
 import { parseSourceStatus, registerSource } from "../src/content/source-registry";
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 

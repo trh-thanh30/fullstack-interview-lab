@@ -8,7 +8,7 @@ import { vector } from "@electric-sql/pglite-pgvector";
 import { drizzle } from "drizzle-orm/pglite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { seedSystemDesignProblems, seedTaxonomy } from "../seed";
+import { seedStarterQuestions, seedSystemDesignProblems, seedTaxonomy } from "../seed";
 
 describe("initial database migration", () => {
   let client: PGlite;
@@ -102,8 +102,10 @@ describe("initial database migration", () => {
       "backend",
       "devops",
       "architecture",
+      "java-sql-exam",
+      "java-sql-extended",
     ]);
-    expect(technologies.rows[0]?.count).toBe(18);
+    expect(technologies.rows[0]?.count).toBe(23);
   });
 
   it("enforces source uniqueness and question foreign keys", async () => {
@@ -144,5 +146,48 @@ describe("initial database migration", () => {
     await seedSystemDesignProblems(database);
     const result = await client.query<{ count: number }>("SELECT count(*)::int AS count FROM system_design_problems WHERE reviewed_at IS NOT NULL");
     expect(result.rows[0]?.count).toBe(3);
+  });
+
+  it("seeds the published starter question pack idempotently", async () => {
+    const database = drizzle({ client });
+    await seedTaxonomy(database);
+    await seedStarterQuestions(database);
+    await seedStarterQuestions(database);
+
+    const questions = await client.query<{ type: string; count: number }>(`
+      SELECT type, count(*)::int AS count
+      FROM questions
+      WHERE is_manual = true AND status = 'published'
+      GROUP BY type
+      ORDER BY type
+    `);
+    const invalidMcq = await client.query<{ count: number }>(`
+      SELECT count(*)::int AS count
+      FROM questions q
+      WHERE q.type = 'mcq'
+        AND q.is_manual = true
+        AND (
+          SELECT count(*)
+          FROM question_choices qc
+          WHERE qc.question_id = q.id AND qc.is_correct = true
+        ) <> 1
+    `);
+    const interviewWithoutRubric = await client.query<{ count: number }>(`
+      SELECT count(*)::int AS count
+      FROM questions q
+      LEFT JOIN rubrics r ON r.question_id = q.id
+      WHERE q.type IN ('short_answer', 'deep_dive')
+        AND q.is_manual = true
+        AND r.id IS NULL
+    `);
+
+    expect(questions.rows).toEqual([
+      { type: "mcq", count: 540 },
+      { type: "short_answer", count: 8 },
+      { type: "deep_dive", count: 25 },
+      { type: "coding", count: 35 },
+    ]);
+    expect(invalidMcq.rows[0]?.count).toBe(0);
+    expect(interviewWithoutRubric.rows[0]?.count).toBe(0);
   });
 });

@@ -1,10 +1,12 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 
 import { DrizzleSourceNormalizationStore } from "../src/content/drizzle-source-normalization-store";
 import { GeminiEmbeddingProvider } from "../src/content/embedding-provider";
 import { normalizeSourceContent } from "../src/content/source-normalization";
 import { seedTaxonomy } from "../src/db/seed";
 import { getRequiredEnv } from "../src/lib/env";
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 

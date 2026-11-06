@@ -1,5 +1,7 @@
 import "server-only";
 
+import { connection } from "next/server";
+
 import { auth } from "@/auth";
 import { isAllowedEmail } from "@/lib/auth/allowlist";
 
@@ -18,6 +20,9 @@ export class UnauthorizedError extends Error {
 }
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+  // Auth.js evaluates JWT/session expiry using the current time. With Cache
+  // Components enabled, explicitly defer that work until a real request exists.
+  await connection();
   const session = await auth();
   const sessionUser = session?.user;
 

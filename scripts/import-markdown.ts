@@ -1,9 +1,11 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 
 import { DrizzleSourceChunkStore } from "../src/content/drizzle-source-chunk-store";
 import { DrizzleSourceRegistryStore } from "../src/content/drizzle-source-registry-store";
 import { importMarkdownBatch } from "../src/content/markdown-importer";
 import { discoverAllowlistedMarkdownFiles } from "../src/content/markdown-source-allowlist";
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 

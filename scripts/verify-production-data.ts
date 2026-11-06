@@ -1,7 +1,9 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 import { and, count, eq } from "drizzle-orm";
 
 import { questions, sources, systemDesignProblems } from "../src/db/schema";
+
+const { loadEnvConfig } = nextEnv;
 
 loadEnvConfig(process.cwd());
 const { getDatabase } = await import("../src/db/client");

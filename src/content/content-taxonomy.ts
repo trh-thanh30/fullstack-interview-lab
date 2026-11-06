@@ -49,6 +49,7 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
 };
 
 const LEVEL_KEYWORDS: Record<SourceLevel, string[]> = {
+  fresher: ["fresher", "entry-level", "new graduate", "intern", "thực tập", "mới bắt đầu"],
   junior: ["junior", "beginner", "basic", "fundamental", "cơ bản", "nhập môn"],
   middle: ["middle", "mid-level", "intermediate", "trung cấp"],
   senior: ["senior", "advanced", "expert", "nâng cao", "chuyên sâu", "trade-off"],

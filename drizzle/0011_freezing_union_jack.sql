@@ -1,0 +1,1 @@
+ALTER TYPE "public"."question_level" ADD VALUE 'fresher' BEFORE 'junior';

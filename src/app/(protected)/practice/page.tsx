@@ -19,7 +19,11 @@ import { getDatabase } from "@/db/client";
 import { questionLevelValues } from "@/db/schema";
 import { requireAuthenticatedUser } from "@/lib/auth/dal";
 import { cn } from "@/lib/utils";
-import { parsePracticeSearchParams, practiceStrategyValues } from "@/practice/practice-config";
+import {
+  parsePracticeSearchParams,
+  practiceQuestionCountOptions,
+  practiceStrategyValues,
+} from "@/practice/practice-config";
 import { PracticeStore } from "@/practice/practice-store";
 
 import { StartSessionForm } from "./start-session-form";
@@ -87,7 +91,7 @@ async function PracticeContent({
               </Field>
               <Field label="Số câu">
                 <select className={selectClass} defaultValue={String(configuration.questionCount)} name="questionCount">
-                  {[1, 3, 5, 10, 15, 20, 30, 50].map((count) => <option key={count} value={count}>{count} câu</option>)}
+                  {practiceQuestionCountOptions.map((count) => <option key={count} value={count}>{count} câu</option>)}
                 </select>
               </Field>
               <Field label="Selection strategy">

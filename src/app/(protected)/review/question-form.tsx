@@ -107,7 +107,7 @@ export function QuestionForm({
               </Field>
               <Field label="Level" error={state.fieldErrors?.level?.[0]}>
                 <select className={selectClassName} defaultValue={initialValues?.level ?? "middle"} name="level">
-                  <option value="junior">Junior</option><option value="middle">Middle</option><option value="senior">Senior</option>
+                  <option value="fresher">Fresher</option><option value="junior">Junior</option><option value="middle">Middle</option><option value="senior">Senior</option>
                 </select>
               </Field>
               <Field label="Status" error={state.fieldErrors?.status?.[0]}>
